@@ -12,6 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
+using OnlineShopWebAPIs.Helpers;
 using OnlineShopWebAPIs.Interfaces.IUnitOfWork;
 using OnlineShopWebAPIs.Models.DBContext;
 
@@ -30,7 +31,7 @@ namespace OnlineShopWebAPIs
         public void ConfigureServices(IServiceCollection services)
         {
 
-            services.AddControllers();
+            services.AddControllers().AddNewtonsoftJson(options=>options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
 
 
             //DbContext congig
@@ -39,6 +40,9 @@ namespace OnlineShopWebAPIs
 
             //IUnitOfWork Config
             services.AddScoped<IUnitOfWork, UnitOfWork.UnitOfWork>();
+
+            //AutoMapper
+            services.AddAutoMapper(typeof(ApplicationMappingProfile));
 
 
             services.AddSwaggerGen(c =>

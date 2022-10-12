@@ -10,8 +10,8 @@ namespace OnlineShopWebAPIs.Interfaces.IGeneralRepository
     {
         public T GetById(int id);
         public IEnumerable<T> GetAll(List<string> includes = null, Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null);
-        public IEnumerable<T> Find(Expression<Func<T, bool>> predicate, List<string> includes = null, Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null);
-
+        public IEnumerable<T> FindRange(Expression<Func<T, bool>> predicate, List<string> includes = null, Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null);
+        public T Find(Expression<Func<T, bool>> predicate, List<string> includes = null, Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null);
         public void Insert(T entity);
         public void InsertRange(List<T> entities);
 

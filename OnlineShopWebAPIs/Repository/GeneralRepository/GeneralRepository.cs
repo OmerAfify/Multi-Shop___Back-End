@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using OnlineShopWebAPIs.Interfaces.IGeneralRepository;
@@ -20,7 +21,6 @@ namespace OnlineShopWebAPIs.Repository.GeneralRepository
             _dbSet = _context.Set<T>();
         }
 
-
         public T GetById(int id)
         {
             return _dbSet.Find(id);
@@ -33,34 +33,34 @@ namespace OnlineShopWebAPIs.Repository.GeneralRepository
             {
                 foreach (var include in includes)
                 {
-                    query.Include(include);
+                    query = query.Include(include);
                 }
             }
-
 
             if(orderBy != null)
             {
                 query = orderBy(query);
             }
 
+        
             return query.AsNoTracking().ToList();
 
+
         }
-        public IEnumerable<T> Find(System.Linq.Expressions.Expression<Func<T, bool>> predicate, List<string> includes = null, Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null)
-        {
+        public T Find(Expression<Func<T, bool>> predicate, List<string> includes = null, Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null) {
+
             IQueryable<T> query = _dbSet;
 
             if (predicate != null)
             {
-                query.Where(predicate);
+                query = query.Where(predicate);
             }
-
 
             if (includes != null)
             {
                 foreach (var include in includes)
                 {
-                    query.Include(include);
+                    query = query.Include(include);
                 }
             }
 
@@ -69,7 +69,35 @@ namespace OnlineShopWebAPIs.Repository.GeneralRepository
                 query = orderBy(query);
             }
 
-            return query.AsNoTracking();
+
+            return query.FirstOrDefault();
+
+        }
+        public IEnumerable<T> FindRange(Expression<Func<T, bool>> predicate, List<string> includes = null, Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null)
+        {
+            IQueryable<T> query = _dbSet;
+
+            if (predicate != null)
+            {
+                query = query.Where(predicate);
+            }
+
+
+            if (includes != null)
+            {
+                foreach (var include in includes)
+                {
+                  query =  query.Include(include);
+                }
+            }
+
+            if (orderBy != null)
+            {
+                query = orderBy(query);
+            }
+
+    
+            return query.ToList();
 
         }
 

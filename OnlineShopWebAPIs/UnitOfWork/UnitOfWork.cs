@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using OnlineShopWebAPIs.Interfaces.IGeneralRepository;
 using OnlineShopWebAPIs.Interfaces.IUnitOfWork;
 using OnlineShopWebAPIs.Models;
@@ -37,6 +38,7 @@ namespace OnlineShopWebAPIs.UnitOfWork
 
         public void Save()
         {
+           // _context.Set<Product>().Where(c => c.productId == 1);
             _context.SaveChanges();
         }
     }

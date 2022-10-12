@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\zakaw\\source\\repos\\OnlineShopWebAPIs\\OnlineShopWebAPIs\\OnlineShopWebAPIs.csproj": {}
+    "D:\\6-Programming and courses\\My Local Projects Repository\\ASP.net MVC\\OnlineShopWebAPIs\\OnlineShopWebAPIs\\OnlineShopWebAPIs.csproj": {}
   },
   "projects": {
-    "C:\\Users\\zakaw\\source\\repos\\OnlineShopWebAPIs\\OnlineShopWebAPIs\\OnlineShopWebAPIs.csproj": {
+    "D:\\6-Programming and courses\\My Local Projects Repository\\ASP.net MVC\\OnlineShopWebAPIs\\OnlineShopWebAPIs\\OnlineShopWebAPIs.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\zakaw\\source\\repos\\OnlineShopWebAPIs\\OnlineShopWebAPIs\\OnlineShopWebAPIs.csproj",
+        "projectUniqueName": "D:\\6-Programming and courses\\My Local Projects Repository\\ASP.net MVC\\OnlineShopWebAPIs\\OnlineShopWebAPIs\\OnlineShopWebAPIs.csproj",
         "projectName": "OnlineShopWebAPIs",
-        "projectPath": "C:\\Users\\zakaw\\source\\repos\\OnlineShopWebAPIs\\OnlineShopWebAPIs\\OnlineShopWebAPIs.csproj",
+        "projectPath": "D:\\6-Programming and courses\\My Local Projects Repository\\ASP.net MVC\\OnlineShopWebAPIs\\OnlineShopWebAPIs\\OnlineShopWebAPIs.csproj",
         "packagesPath": "C:\\Users\\zakaw\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\zakaw\\source\\repos\\OnlineShopWebAPIs\\OnlineShopWebAPIs\\obj\\",
+        "outputPath": "D:\\6-Programming and courses\\My Local Projects Repository\\ASP.net MVC\\OnlineShopWebAPIs\\OnlineShopWebAPIs\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\zakaw\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -40,7 +40,15 @@
         "net5.0": {
           "targetAlias": "net5.0",
           "dependencies": {
+            "AutoMapper.Extensions.Microsoft.DependencyInjection": {
+              "target": "Package",
+              "version": "[12.0.0, )"
+            },
             "Microsoft.AspNetCore.Identity.EntityFrameworkCore": {
+              "target": "Package",
+              "version": "[5.0.17, )"
+            },
+            "Microsoft.AspNetCore.Mvc.NewtonsoftJson": {
               "target": "Package",
               "version": "[5.0.17, )"
             },
