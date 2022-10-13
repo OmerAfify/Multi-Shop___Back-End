@@ -16,6 +16,11 @@ namespace OnlineShopWebAPIs.Helpers
             .ForMember(dest =>
                 dest.categoryName,
                 opt => opt.MapFrom(src => src.category.categoryName));
+            
+            CreateMap<Category, CategoryDTO>()
+            .ForMember(dest =>
+                dest.productsNumber,
+                opt => opt.MapFrom(src => src.products.Count));
         }
     }
 }

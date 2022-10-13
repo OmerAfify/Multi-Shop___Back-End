@@ -62,9 +62,17 @@
               "target": "Package",
               "version": "[5.0.17, )"
             },
+            "Serilog.AspNetCore": {
+              "target": "Package",
+              "version": "[5.0.0, )"
+            },
             "Swashbuckle.AspNetCore": {
               "target": "Package",
               "version": "[5.6.3, )"
+            },
+            "System.Drawing.Common": {
+              "target": "Package",
+              "version": "[6.0.0, )"
             }
           },
           "imports": [

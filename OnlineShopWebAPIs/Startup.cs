@@ -15,6 +15,7 @@ using Microsoft.OpenApi.Models;
 using OnlineShopWebAPIs.Helpers;
 using OnlineShopWebAPIs.Interfaces.IUnitOfWork;
 using OnlineShopWebAPIs.Models.DBContext;
+using Serilog;
 
 namespace OnlineShopWebAPIs
 {
@@ -23,6 +24,7 @@ namespace OnlineShopWebAPIs
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
+            Log.Logger = new LoggerConfiguration().ReadFrom.Configuration(Configuration).CreateLogger();
         }
 
         public IConfiguration Configuration { get; }

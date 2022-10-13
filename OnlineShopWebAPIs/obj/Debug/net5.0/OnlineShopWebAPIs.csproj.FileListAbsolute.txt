@@ -139,3 +139,13 @@ D:\6-Programming and courses\My Local Projects Repository\ASP.net MVC\OnlineShop
 D:\6-Programming and courses\My Local Projects Repository\ASP.net MVC\OnlineShopWebAPIs\OnlineShopWebAPIs\bin\Debug\net5.0\Microsoft.AspNetCore.JsonPatch.dll
 D:\6-Programming and courses\My Local Projects Repository\ASP.net MVC\OnlineShopWebAPIs\OnlineShopWebAPIs\bin\Debug\net5.0\Microsoft.AspNetCore.Mvc.NewtonsoftJson.dll
 D:\6-Programming and courses\My Local Projects Repository\ASP.net MVC\OnlineShopWebAPIs\OnlineShopWebAPIs\bin\Debug\net5.0\Newtonsoft.Json.Bson.dll
+D:\6-Programming and courses\My Local Projects Repository\ASP.net MVC\OnlineShopWebAPIs\OnlineShopWebAPIs\bin\Debug\net5.0\Microsoft.Extensions.DependencyModel.dll
+D:\6-Programming and courses\My Local Projects Repository\ASP.net MVC\OnlineShopWebAPIs\OnlineShopWebAPIs\bin\Debug\net5.0\Serilog.dll
+D:\6-Programming and courses\My Local Projects Repository\ASP.net MVC\OnlineShopWebAPIs\OnlineShopWebAPIs\bin\Debug\net5.0\Serilog.AspNetCore.dll
+D:\6-Programming and courses\My Local Projects Repository\ASP.net MVC\OnlineShopWebAPIs\OnlineShopWebAPIs\bin\Debug\net5.0\Serilog.Extensions.Hosting.dll
+D:\6-Programming and courses\My Local Projects Repository\ASP.net MVC\OnlineShopWebAPIs\OnlineShopWebAPIs\bin\Debug\net5.0\Serilog.Extensions.Logging.dll
+D:\6-Programming and courses\My Local Projects Repository\ASP.net MVC\OnlineShopWebAPIs\OnlineShopWebAPIs\bin\Debug\net5.0\Serilog.Formatting.Compact.dll
+D:\6-Programming and courses\My Local Projects Repository\ASP.net MVC\OnlineShopWebAPIs\OnlineShopWebAPIs\bin\Debug\net5.0\Serilog.Settings.Configuration.dll
+D:\6-Programming and courses\My Local Projects Repository\ASP.net MVC\OnlineShopWebAPIs\OnlineShopWebAPIs\bin\Debug\net5.0\Serilog.Sinks.Console.dll
+D:\6-Programming and courses\My Local Projects Repository\ASP.net MVC\OnlineShopWebAPIs\OnlineShopWebAPIs\bin\Debug\net5.0\Serilog.Sinks.Debug.dll
+D:\6-Programming and courses\My Local Projects Repository\ASP.net MVC\OnlineShopWebAPIs\OnlineShopWebAPIs\bin\Debug\net5.0\Serilog.Sinks.File.dll
