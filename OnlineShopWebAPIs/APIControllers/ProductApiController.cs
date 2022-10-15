@@ -1,23 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing.Imaging;
 using System.IO;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using AutoMapper;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Hosting.Internal;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using OnlineShopWebAPIs.DTOs;
+using OnlineShopWebAPIs.Helpers;
 using OnlineShopWebAPIs.Interfaces.IUnitOfWork;
 using OnlineShopWebAPIs.Models;
-using OnlineShopWebAPIs.Models.DBContext;
-using static System.Net.Mime.MediaTypeNames;
+using OnlineShopWebAPIs.Models.SettingsModels;
+using OnlineShopWebAPIs.ViewModels;
+
 
 namespace OnlineShopWebAPIs.Controllers
 {
@@ -29,13 +24,15 @@ namespace OnlineShopWebAPIs.Controllers
         private IUnitOfWork _unitOfWork{ get;}
         private IMapper _mapper{ get;}
         private ILogger<ProductApiController> _logger{ get;}
+        private IOptions<WebAppSettings> _webAppSettings { get; }
 
-
-        public ProductApiController(IUnitOfWork unitOfWork, IMapper mapper, ILogger<ProductApiController> logger)
+        public ProductApiController(IUnitOfWork unitOfWork, IMapper mapper, ILogger<ProductApiController> logger, IOptions<WebAppSettings> webAppSettings )
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _logger = logger;
+            _webAppSettings = webAppSettings;
+
         }
 
 
@@ -45,7 +42,11 @@ namespace OnlineShopWebAPIs.Controllers
             try {
                 
                 _logger.LogInformation("api '/api/GetAllProducts' is being accessed by user _x_ .");
-                return Ok(_mapper.Map<List<ProductDTO>>(_unitOfWork.Products.GetAll(new List<string>() { "category" })));
+
+                var productsList = _mapper.Map<List<ProductDTO>>(_unitOfWork.Products.GetAll(new List<string>() { "category", "productImages" }));   
+                   productsList.ForEach(c => c.productImages.ForEach(i=>i.productImagePath = _webAppSettings.Value.HostName +  i.productImagePath));
+                
+                return Ok(productsList);
             
             }catch(Exception ex)
             {
@@ -64,7 +65,12 @@ namespace OnlineShopWebAPIs.Controllers
             try
             {
                 _logger.LogInformation($"api  '/api/GetProductById/{id}' is being accessed by user _x_ .");
-                return Ok(_mapper.Map<ProductDTO>(_unitOfWork.Products.Find(c => c.productId == id, new List<string>() { "category" })));
+               
+                var product = _mapper.Map<ProductDTO>(_unitOfWork.Products.Find(c => c.productId == id, new List<string>() { "category", "productImages" }));
+             
+                product.productImages.ForEach(i=>i.productImagePath = _webAppSettings.Value.HostName + i.productImagePath);
+
+                return Ok(product);
             }
             catch (Exception ex)
             {
@@ -73,10 +79,57 @@ namespace OnlineShopWebAPIs.Controllers
 
             }
 
-            
         }
 
     
+
+        [HttpPost]
+        public async Task<IActionResult> AddNewProduct([FromForm]AddPostVIewModel addPostViewModel) 
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            try
+            {
+                _logger.LogInformation($"api  '/api/AddNewProduct/' is being accessed by user _x_ .");
+
+                Product product = _mapper.Map<Product>(addPostViewModel.addProductDTO);
+                _unitOfWork.Products.Insert(product);
+                _unitOfWork.Save();
+
+                if (addPostViewModel.images != null )
+                {
+                  
+                    foreach(var image in addPostViewModel.images)
+                    {
+                        //Upload file + get the image's created unique Name.
+                        var imageName = await ImageUploadingHelper.UploadImage(image, Path.Combine(Directory.GetCurrentDirectory(), @"wwwRoot\Images\ProductsImages\cat" + product.categoryId));
+
+                        //Get the uploaded images full path
+                        var imagesPath = Path.Combine(@"Images/ProductsImages/cat" + product.categoryId+ "/"+ imageName);
+
+                        //new product Image Object
+                        ProductImage productImage = new ProductImage() {
+                            productId = product.productId,
+                            productImageName = imageName,
+                            productImagePath = imagesPath
+                        };
+
+                        _unitOfWork.ProductImages.Insert(productImage);
+                        _unitOfWork.Save();
+                    }
+                }
+
+                return Accepted();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, " Something went wrong in " + nameof(AddNewProduct));
+                return StatusCode(500, "Internal Server error. Please try again later.");
+
+            }
+        }
+
 
     }
 }

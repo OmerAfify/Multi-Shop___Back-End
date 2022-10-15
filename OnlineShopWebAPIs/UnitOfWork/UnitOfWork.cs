@@ -19,6 +19,7 @@ namespace OnlineShopWebAPIs.UnitOfWork
         public IGeneralRepository<Product> Products { get; }
         public IGeneralRepository<Category> Categories { get; }
         public IGeneralRepository<Review> Reviews { get; }
+        public IGeneralRepository<ProductImage> ProductImages { get; }
 
 
         public UnitOfWork(OnlineShopDbContext context)
@@ -28,6 +29,7 @@ namespace OnlineShopWebAPIs.UnitOfWork
             Products = new GeneralRepository<Product>(context);
             Categories = new GeneralRepository<Category>(context);
             Reviews = new GeneralRepository<Review>(context);
+            ProductImages = new GeneralRepository<ProductImage>(context);
         }
 
 

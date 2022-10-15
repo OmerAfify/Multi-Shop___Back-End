@@ -12,6 +12,7 @@ namespace OnlineShopWebAPIs.Interfaces.IUnitOfWork
         IGeneralRepository<Product> Products { get; } 
         IGeneralRepository<Category> Categories { get; } 
         IGeneralRepository<Review> Reviews { get; }
+        IGeneralRepository<ProductImage> ProductImages { get; }
 
         public void Save();
     }

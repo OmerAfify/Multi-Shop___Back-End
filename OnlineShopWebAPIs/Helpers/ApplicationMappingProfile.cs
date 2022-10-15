@@ -3,20 +3,34 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using OnlineShopWebAPIs.DTOs;
 using OnlineShopWebAPIs.Models;
+using OnlineShopWebAPIs.Models.SettingsModels;
 
 namespace OnlineShopWebAPIs.Helpers
 {
     public class ApplicationMappingProfile :Profile
     {
+
+   
+
         public ApplicationMappingProfile()
         {
+
+
+            CreateMap<Product, AddProductDTO>().ReverseMap();
+
+            CreateMap<ProductImage, ProductImageDTO>().ReverseMap();
+
             CreateMap<Product, ProductDTO>()
             .ForMember(dest =>
                 dest.categoryName,
                 opt => opt.MapFrom(src => src.category.categoryName));
-            
+
+
+
             CreateMap<Category, CategoryDTO>()
             .ForMember(dest =>
                 dest.productsNumber,

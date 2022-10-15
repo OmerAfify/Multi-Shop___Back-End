@@ -149,3 +149,8 @@ D:\6-Programming and courses\My Local Projects Repository\ASP.net MVC\OnlineShop
 D:\6-Programming and courses\My Local Projects Repository\ASP.net MVC\OnlineShopWebAPIs\OnlineShopWebAPIs\bin\Debug\net5.0\Serilog.Sinks.Console.dll
 D:\6-Programming and courses\My Local Projects Repository\ASP.net MVC\OnlineShopWebAPIs\OnlineShopWebAPIs\bin\Debug\net5.0\Serilog.Sinks.Debug.dll
 D:\6-Programming and courses\My Local Projects Repository\ASP.net MVC\OnlineShopWebAPIs\OnlineShopWebAPIs\bin\Debug\net5.0\Serilog.Sinks.File.dll
+D:\6-Programming and courses\My Local Projects Repository\ASP.net MVC\OnlineShopWebAPIs\OnlineShopWebAPIs\bin\Debug\net5.0\Microsoft.Win32.SystemEvents.dll
+D:\6-Programming and courses\My Local Projects Repository\ASP.net MVC\OnlineShopWebAPIs\OnlineShopWebAPIs\bin\Debug\net5.0\System.Drawing.Common.dll
+D:\6-Programming and courses\My Local Projects Repository\ASP.net MVC\OnlineShopWebAPIs\OnlineShopWebAPIs\bin\Debug\net5.0\runtimes\win\lib\netcoreapp3.1\Microsoft.Win32.SystemEvents.dll
+D:\6-Programming and courses\My Local Projects Repository\ASP.net MVC\OnlineShopWebAPIs\OnlineShopWebAPIs\bin\Debug\net5.0\runtimes\unix\lib\netcoreapp3.1\System.Drawing.Common.dll
+D:\6-Programming and courses\My Local Projects Repository\ASP.net MVC\OnlineShopWebAPIs\OnlineShopWebAPIs\bin\Debug\net5.0\runtimes\win\lib\netcoreapp3.1\System.Drawing.Common.dll

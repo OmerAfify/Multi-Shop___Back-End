@@ -15,24 +15,28 @@ using Microsoft.OpenApi.Models;
 using OnlineShopWebAPIs.Helpers;
 using OnlineShopWebAPIs.Interfaces.IUnitOfWork;
 using OnlineShopWebAPIs.Models.DBContext;
+using OnlineShopWebAPIs.Models.SettingsModels;
 using Serilog;
 
 namespace OnlineShopWebAPIs
 {
     public class Startup
     {
+        public IConfiguration Configuration { get; }
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
             Log.Logger = new LoggerConfiguration().ReadFrom.Configuration(Configuration).CreateLogger();
         }
 
-        public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
 
+            //Bind appsettings Node properties of "WebAppSettings" with the Model "WebAppSettings"
+            services.Configure<WebAppSettings>(Configuration.GetSection("WebAppSettings"));
+
+            //Controllers Config + Self-Referencing loop config
             services.AddControllers().AddNewtonsoftJson(options=>options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
 
 
@@ -43,10 +47,10 @@ namespace OnlineShopWebAPIs
             //IUnitOfWork Config
             services.AddScoped<IUnitOfWork, UnitOfWork.UnitOfWork>();
 
-            //AutoMapper
+            //AutoMapper config
             services.AddAutoMapper(typeof(ApplicationMappingProfile));
 
-
+            //Swagger config
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "OnlineShopWebAPIs", Version = "v1" });
@@ -58,7 +62,6 @@ namespace OnlineShopWebAPIs
 
 
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
@@ -71,6 +74,8 @@ namespace OnlineShopWebAPIs
             app.UseHttpsRedirection();
 
             app.UseRouting();
+
+            app.UseStaticFiles();
 
             app.UseAuthorization();
 

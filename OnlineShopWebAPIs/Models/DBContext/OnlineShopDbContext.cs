@@ -16,6 +16,7 @@ namespace OnlineShopWebAPIs.Models.DBContext
         public DbSet<Product> Tb_Products { get; set; }
         public DbSet<Category> Tb_Categories { get; set; }
         public DbSet<Review> Tb_Reviews { get; set; }
+        public DbSet<ProductImage> Tb_ProductImages { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
