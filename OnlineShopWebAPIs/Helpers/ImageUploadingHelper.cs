@@ -34,7 +34,7 @@ namespace OnlineShopWebAPIs.Helpers
                 return true;
             }
             catch(Exception ex)
-            {
+            { 
                 return false;
             }
 
@@ -44,25 +44,7 @@ namespace OnlineShopWebAPIs.Helpers
      
 
         
-        public static async Task UploadImage(List<IFormFile> imagesUploaded , string pathToAddImgIn )
-        {
-           
-            foreach(var image in imagesUploaded) { 
-            
-            string ImgName = Guid.NewGuid().ToString() + "jpg";
 
-            var path = Path.Combine(pathToAddImgIn,ImgName);
-            
-            using (FileStream stream = File.Create(path))
-            {
-                await image.CopyToAsync(stream);
-                stream.Close();
-            }
-
-
-            }
-
-        }
 
 
 
