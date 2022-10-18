@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
@@ -67,8 +68,8 @@ namespace OnlineShopWebAPIs.Controllers
                 _logger.LogInformation($"api  '/api/GetProductById/{id}' is being accessed by user _x_ .");
                
                 var product = _mapper.Map<ProductDTO>(_unitOfWork.Products.Find(c => c.productId == id, new List<string>() { "category", "productImages" }));
-             
                 product.productImages.ForEach(i=>i.productImagePath = _webAppSettings.Value.HostName + i.productImagePath);
+
 
                 return Ok(product);
             }
@@ -81,10 +82,9 @@ namespace OnlineShopWebAPIs.Controllers
 
         }
 
-    
 
         [HttpPost]
-        public async Task<IActionResult> AddNewProduct([FromForm]AddPostVIewModel addPostViewModel) 
+        public async Task<IActionResult> AddNewProduct([FromForm]ProductInFormVm productInFormVm) 
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -93,14 +93,14 @@ namespace OnlineShopWebAPIs.Controllers
             {
                 _logger.LogInformation($"api  '/api/AddNewProduct/' is being accessed by user _x_ .");
 
-                Product product = _mapper.Map<Product>(addPostViewModel.addProductDTO);
+                Product product = _mapper.Map<Product>(productInFormVm.addProductDTO);
                 _unitOfWork.Products.Insert(product);
                 _unitOfWork.Save();
 
-                if (addPostViewModel.images != null )
+                if (productInFormVm.images != null )
                 {
                   
-                    foreach(var image in addPostViewModel.images)
+                    foreach(var image in productInFormVm.images)
                     {
                         //Upload file + get the image's created unique Name.
                         var imageName = await ImageUploadingHelper.UploadImage(image, Path.Combine(Directory.GetCurrentDirectory(), @"wwwRoot\Images\ProductsImages\cat" + product.categoryId));
@@ -129,6 +129,129 @@ namespace OnlineShopWebAPIs.Controllers
 
             }
         }
+
+    
+        [HttpPut]
+        public async Task<IActionResult> UpdateProduct (int id, [FromForm]ProductInFormVm productInFormVm)
+        {
+
+            if (!ModelState.IsValid || id < 1 )
+                return BadRequest(ModelState);
+
+            try
+            {
+                _logger.LogInformation($"api  '/api/UpdateProduct/' is being accessed by user _x_ .");
+
+
+                var product = _unitOfWork.Products.GetById(id);
+               
+                if(product == null)
+                {
+                    return BadRequest("the submitted data is invalid");
+                }
+
+                _mapper.Map(productInFormVm.addProductDTO, product);
+
+                _unitOfWork.Products.Update(product);
+                _unitOfWork.Save();
+
+
+                if (productInFormVm.images != null)
+                {
+
+                    foreach (var image in productInFormVm.images)
+                    {
+                        //if(image.FileName is included in path /Cat+ catID )
+                        //{
+                        //    continue;
+
+                        //// TODO list
+                        // 1- get list of images names
+                        // 2- if exists in DB dont raise it again
+                        // 3 - if doesnt exists in db . raise it.
+                        // 4- else remove all rest in the db
+
+
+                        //}
+
+
+                        //upload file + get the image's created unique name
+                        var imagename = await ImageUploadingHelper.UploadImage(image, Path.Combine(Directory.GetCurrentDirectory(), @"wwwroot\Images\Productsimages\cat" + product.categoryId));
+
+                        //get the uploaded images full path
+                        var imagespath = Path.Combine(@"Images/Productsimages/cat" + product.categoryId + "/" + imagename);
+
+                        //new product image object
+                        ProductImage productImage = new ProductImage()
+                        {
+                            productId = product.productId,
+                            productImageName = imagename,
+                            productImagePath = imagespath
+                        };
+
+                        _unitOfWork.ProductImages.Insert(productImage);
+                        _unitOfWork.Save();
+                    }
+                }
+
+
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, " Something went wrong in " + nameof(UpdateProduct));
+                return StatusCode(500, "Internal Server error. Please try again later.");
+
+            }
+
+        }
+
+
+        [HttpDelete]
+        public async Task<IActionResult> DeleteProduct(int id)
+        {
+
+            if (id < 1)
+                return BadRequest(ModelState);
+
+            try
+            {
+                _logger.LogInformation($"api  '/api/DeleteProduct/' is being accessed by user _x_ .");
+
+
+                var product = _unitOfWork.Products.GetById(id);
+
+                if (product == null)
+                {
+                    return BadRequest("the submitted data is invalid");
+                }
+
+
+                var ImagesList = _unitOfWork.ProductImages.FindRange(i => i.productId == product.productId).ToList();
+
+                foreach(var image in ImagesList)
+                {
+                    var path = Path.Combine(Directory.GetCurrentDirectory(), @"wwwroot\Images\Productsimages\cat" + product.categoryId + @"\" + image.productImageName );
+                    ImageUploadingHelper.DeleteImage(path);
+                }
+
+                _unitOfWork.Products.Delete(product);
+
+                _unitOfWork.Save();
+
+                return NoContent();  
+             
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, " Something went wrong in " + nameof(DeleteProduct));
+                return StatusCode(500, "Internal Server error. Please try again later.");
+
+            }
+
+        }
+
+
 
 
     }

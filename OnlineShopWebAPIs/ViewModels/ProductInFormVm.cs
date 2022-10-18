@@ -7,7 +7,7 @@ using OnlineShopWebAPIs.DTOs;
 
 namespace OnlineShopWebAPIs.ViewModels
 {
-    public class AddPostVIewModel
+    public class ProductInFormVm
     {
         public List<IFormFile> images { get; set; }
         public AddProductDTO addProductDTO { get; set; }

@@ -24,10 +24,25 @@ namespace OnlineShopWebAPIs.Helpers
                 return ImgName;
             }
 
-      
         }
         
         
+        public static bool DeleteImage(string path)
+        {
+            try { 
+             File.Delete(path);
+                return true;
+            }
+            catch(Exception ex)
+            {
+                return false;
+            }
+
+        }
+
+
+     
+
         
         public static async Task UploadImage(List<IFormFile> imagesUploaded , string pathToAddImgIn )
         {
