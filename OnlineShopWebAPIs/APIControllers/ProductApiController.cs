@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -61,6 +62,7 @@ namespace OnlineShopWebAPIs.Controllers
 
  
         [HttpGet("{id:int}")]
+        [Authorize(Roles = "Customer")]
         public IActionResult GetProductById(int id)
         {
             try
@@ -84,6 +86,7 @@ namespace OnlineShopWebAPIs.Controllers
 
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> AddNewProduct([FromForm]ProductInFormVm productInFormVm) 
         {
             if (!ModelState.IsValid)
@@ -132,6 +135,7 @@ namespace OnlineShopWebAPIs.Controllers
 
     
         [HttpPut]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> UpdateProduct (int id, [FromForm]ProductInFormVm productInFormVm)
         {
 
@@ -196,6 +200,7 @@ namespace OnlineShopWebAPIs.Controllers
 
 
         [HttpDelete]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteProduct(int id)
         {
 
@@ -238,9 +243,6 @@ namespace OnlineShopWebAPIs.Controllers
             }
 
         }
-
-
-
 
 
 

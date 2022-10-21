@@ -2,11 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace OnlineShopWebAPIs.Models.DBContext
 {
-    public class OnlineShopDbContext :DbContext
+    public class OnlineShopDbContext : IdentityDbContext<IdentityUserContext>
     {
         public OnlineShopDbContext(DbContextOptions options) : base(options)
         {
@@ -22,7 +23,7 @@ namespace OnlineShopWebAPIs.Models.DBContext
         {
             base.OnModelCreating(modelBuilder);
 
-          
+       
             //Product Table Config
             modelBuilder.Entity<Product>(entity =>
             {

@@ -13,28 +13,27 @@ namespace OnlineShopWebAPIs.Helpers
 {
     public class ApplicationMappingProfile :Profile
     {
-
-   
-
         public ApplicationMappingProfile()
         {
 
-
             CreateMap<Product, AddProductDTO>().ReverseMap();
-
-            CreateMap<ProductImage, ProductImageDTO>().ReverseMap();
-
+   
             CreateMap<Product, ProductDTO>()
             .ForMember(dest =>
                 dest.categoryName,
                 opt => opt.MapFrom(src => src.category.categoryName));
 
 
+            CreateMap<ProductImage, ProductImageDTO>().ReverseMap();
 
             CreateMap<Category, CategoryDTO>()
             .ForMember(dest =>
                 dest.productsNumber,
                 opt => opt.MapFrom(src => src.products.Count));
+
+
+            CreateMap<UserDTO, IdentityUserContext>().ReverseMap();
+
         }
     }
 }
