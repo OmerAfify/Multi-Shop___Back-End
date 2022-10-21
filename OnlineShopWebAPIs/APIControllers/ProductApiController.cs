@@ -142,58 +142,46 @@ namespace OnlineShopWebAPIs.Controllers
             {
                 _logger.LogInformation($"api  '/api/UpdateProduct/' is being accessed by user _x_ .");
 
-
                 var product = _unitOfWork.Products.GetById(id);
                
                 if(product == null)
-                {
                     return BadRequest("the submitted data is invalid");
-                }
 
-                _mapper.Map(productInFormVm.addProductDTO, product);
+                var ImagesList = _unitOfWork.ProductImages.FindRange(i => i.productId == product.productId).ToList();
 
-                _unitOfWork.Products.Update(product);
-                _unitOfWork.Save();
+                foreach (var image in ImagesList)
+                    ImageUploadingHelper.DeleteImage(Path.Combine(Directory.GetCurrentDirectory(), @"wwwroot\Images\Productsimages\cat" + product.categoryId + @"\" + image.productImageName));
+
+                _unitOfWork.ProductImages.DeleteRange(ImagesList);
 
 
                 if (productInFormVm.images != null)
                 {
-
                     foreach (var image in productInFormVm.images)
                     {
-                        //if(image.FileName is included in path /Cat+ catID )
-                        //{
-                        //    continue;
 
-                        //// TODO list
-                        // 1- get list of images names
-                        // 2- if exists in DB dont raise it again
-                        // 3 - if doesnt exists in db . raise it.
-                        // 4- else remove all rest in the db
+                      var imagename = await ImageUploadingHelper.UploadImage(image, Path.Combine(Directory.GetCurrentDirectory(), @"wwwroot\Images\Productsimages\cat" + productInFormVm.addProductDTO.categoryId));
+                      var imagespath = Path.Combine(@"Images/Productsimages/cat" + productInFormVm.addProductDTO.categoryId + "/" + imagename);
 
+                       ProductImage productImage = new ProductImage()
+                         {
+                              productId = product.productId,
+                              productImageName = imagename,
+                              productImagePath = imagespath
+                         };
 
-                        //}
-
-
-                        //upload file + get the image's created unique name
-                        var imagename = await ImageUploadingHelper.UploadImage(image, Path.Combine(Directory.GetCurrentDirectory(), @"wwwroot\Images\Productsimages\cat" + product.categoryId));
-
-                        //get the uploaded images full path
-                        var imagespath = Path.Combine(@"Images/Productsimages/cat" + product.categoryId + "/" + imagename);
-
-                        //new product image object
-                        ProductImage productImage = new ProductImage()
-                        {
-                            productId = product.productId,
-                            productImageName = imagename,
-                            productImagePath = imagespath
-                        };
-
-                        _unitOfWork.ProductImages.Insert(productImage);
-                        _unitOfWork.Save();
+                     _unitOfWork.ProductImages.Insert(productImage);
+                           
                     }
+                  
                 }
 
+
+                _mapper.Map(productInFormVm.addProductDTO, product);
+                _unitOfWork.Products.Update(product);
+
+
+                _unitOfWork.Save();
 
                 return NoContent();
             }
@@ -250,6 +238,117 @@ namespace OnlineShopWebAPIs.Controllers
             }
 
         }
+
+
+
+
+
+
+        //OLD UPDATE CODE>>>>
+
+        //[HttpPut]
+        //public async Task<IActionResult> UpdateProduct(int id, [FromForm] ProductInFormVm productInFormVm)
+        //{
+
+        //    if (!ModelState.IsValid || id < 1)
+        //        return BadRequest(ModelState);
+
+        //    try
+        //    {
+        //        _logger.LogInformation($"api  '/api/UpdateProduct/' is being accessed by user _x_ .");
+
+        //        var product = _unitOfWork.Products.GetById(id);
+
+        //        if (product == null)
+        //            return BadRequest("the submitted data is invalid");
+
+
+        //        var ImagesList = _unitOfWork.ProductImages.FindRange(i => i.productId == product.productId).ToList();
+
+        //        if (productInFormVm.images != null)
+        //        {
+
+        //            var removedImagesNames = ImagesList.Select(i => i.productImageName).Except(productInFormVm.images.Select(i => i.FileName));
+        //            var removedImagesColumns = _unitOfWork.ProductImages.FindRange(i => removedImagesNames.Contains(i.productImageName));
+
+
+        //            foreach (var image in removedImagesColumns)
+        //                ImageUploadingHelper.DeleteImage(Path.Combine(Directory.GetCurrentDirectory(), @"wwwroot\Images\Productsimages\cat" + product.categoryId + @"\" + image.productImageName));
+
+        //            _unitOfWork.ProductImages.DeleteRange(removedImagesColumns.ToList());
+        //            _unitOfWork.Save();
+
+
+        //            foreach (var image in productInFormVm.images)
+        //            {
+
+        //                var Img = _unitOfWork.ProductImages.Find(i => i.productId == product.productId && i.productImageName == image.FileName);
+
+        //                if (Img == null)
+        //                {
+        //                    var imagename = await ImageUploadingHelper.UploadImage(image, Path.Combine(Directory.GetCurrentDirectory(), @"wwwroot\Images\Productsimages\cat" + product.categoryId));
+        //                    var imagespath = Path.Combine(@"Images/Productsimages/cat" + product.categoryId + "/" + imagename);
+
+        //                    ProductImage productImage = new ProductImage()
+        //                    {
+        //                        productId = product.productId,
+        //                        productImageName = imagename,
+        //                        productImagePath = imagespath
+        //                    };
+
+        //                    _unitOfWork.ProductImages.Insert(productImage);
+        //                    _unitOfWork.Save();
+        //                }
+
+
+        //            }
+
+        //            if (productInFormVm.addProductDTO.categoryId != product.categoryId)
+        //            {
+        //                var NewImgList = _unitOfWork.ProductImages.FindRange(i => i.productId == product.productId).ToList();
+
+
+        //                foreach (var image in NewImgList)
+        //                {
+
+        //                    var source = Path.Combine(Directory.GetCurrentDirectory(), @"wwwroot\Images\Productsimages\cat" + product.categoryId + @"\" + image.productImageName);
+        //                    var dest = Path.Combine(Directory.GetCurrentDirectory(), @"wwwroot\Images\Productsimages\cat" + productInFormVm.addProductDTO.categoryId + @"\" + image.productImageName);
+
+        //                    var result = ImageUploadingHelper.MoveImage(source, dest);
+
+        //                    if (result)
+        //                        image.productImagePath = Path.Combine(@"Images/Productsimages/cat" + productInFormVm.addProductDTO.categoryId + "/" + image.productImageName);
+
+        //                }
+
+        //            }
+        //        }
+        //        else
+        //        {
+
+        //            foreach (var image in ImagesList)
+        //                ImageUploadingHelper.DeleteImage(Path.Combine(Directory.GetCurrentDirectory(), @"wwwroot\Images\Productsimages\cat" + product.categoryId + @"\" + image.productImageName));
+
+        //            _unitOfWork.ProductImages.DeleteRange(_unitOfWork.ProductImages.FindRange(i => i.productId == product.productId).ToList());
+        //        }
+
+
+        //        _mapper.Map(productInFormVm.addProductDTO, product);
+        //        _unitOfWork.Products.Update(product);
+
+
+        //        _unitOfWork.Save();
+
+        //        return NoContent();
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _logger.LogError(ex, " Something went wrong in " + nameof(UpdateProduct));
+        //        return StatusCode(500, "Internal Server error. Please try again later.");
+
+        //    }
+
+        //}
 
 
 

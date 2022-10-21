@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace OnlineShopWebAPIs.Helpers
 {
-    public static class ImageUploadingHelper
+    public static class ImageUploadingHelper 
     {
 
         public static async Task<string> UploadImage(IFormFile imageUploaded , string pathToAddImgIn )
@@ -20,18 +20,23 @@ namespace OnlineShopWebAPIs.Helpers
             {
                 await imageUploaded.CopyToAsync(stream);
                 stream.Close();
-
-                return ImgName;
             }
+
+            return ImgName;
 
         }
         
         
         public static bool DeleteImage(string path)
         {
-            try { 
+            try {
+
+        
              File.Delete(path);
-                return true;
+            
+             return true;
+                
+
             }
             catch(Exception ex)
             { 
@@ -41,12 +46,19 @@ namespace OnlineShopWebAPIs.Helpers
         }
 
 
-     
+        public static bool MoveImage(string src, string dest)
+        {
+            try {
 
-        
+                File.Move(src, dest);
+                return true;
+                }
+            catch(Exception ex)
+            {
+                return false;
+            }    
+        }
 
-
-
-
+    
     }
 }
