@@ -31,6 +31,7 @@ namespace OnlineShopWebAPIs.Services
             _tokenSettings = tokenSettings;
         }
 
+
         public async Task<bool> ValidateUser (LoginUserDTO loginUserDTO)
         {
             _user = await _userManager.FindByNameAsync(loginUserDTO.email);

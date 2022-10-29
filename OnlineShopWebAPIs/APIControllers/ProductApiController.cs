@@ -46,7 +46,7 @@ namespace OnlineShopWebAPIs.Controllers
                 _logger.LogInformation("api '/api/GetAllProducts' is being accessed by user _x_ .");
 
                 var productsList = _mapper.Map<List<ProductDTO>>(_unitOfWork.Products.GetAll(new List<string>() { "category", "productImages" }));   
-                   productsList.ForEach(c => c.productImages.ForEach(i=>i.productImagePath = _webAppSettings.Value.HostName +  i.productImagePath));
+                    productsList.ForEach(c => c.productImages.ForEach(i=>i.productImagePath = _webAppSettings.Value.HostName +  i.productImagePath));
                 
                 return Ok(productsList);
             
@@ -62,7 +62,6 @@ namespace OnlineShopWebAPIs.Controllers
 
  
         [HttpGet("{id:int}")]
-        [Authorize(Roles = "Customer")]
         public IActionResult GetProductById(int id)
         {
             try
@@ -135,7 +134,7 @@ namespace OnlineShopWebAPIs.Controllers
 
     
         [HttpPut]
-        [Authorize(Roles = "Admin")]
+       // [Authorize(Roles = "Admin")]
         public async Task<IActionResult> UpdateProduct (int id, [FromForm]ProductInFormVm productInFormVm)
         {
 

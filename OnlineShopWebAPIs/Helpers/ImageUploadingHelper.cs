@@ -60,5 +60,17 @@ namespace OnlineShopWebAPIs.Helpers
         }
 
     
+        public static void GetImagesNames()
+        {
+
+            string[] files = Directory.GetFiles(  Path.Combine(Directory.GetCurrentDirectory(), @"wwwRoot\Images\ProductsImages" ));
+            foreach (string file in files)
+                Console.WriteLine(Path.GetDirectoryName(file));
+
+        }
+
+
+
+
     }
 }

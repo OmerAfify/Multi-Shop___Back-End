@@ -40,6 +40,10 @@ namespace OnlineShopWebAPIs
         public void ConfigureServices(IServiceCollection services)
         {
 
+            //CORS policy
+            services.AddCors(opt => opt.AddPolicy("AllowAll", builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()) );
+
+
             //Bind appsettings Node properties of "WebAppSettings" with the Model "WebAppSettings"
             services.Configure<WebAppSettings>(Configuration.GetSection("WebAppSettings"));
 
@@ -110,6 +114,11 @@ namespace OnlineShopWebAPIs
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "OnlineShopWebAPIs v1"));
             }
+
+            app.UseCors(x => x
+           .AllowAnyOrigin()
+           .AllowAnyMethod()
+           .AllowAnyHeader());
 
             app.UseHttpsRedirection();
 

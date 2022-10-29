@@ -42,7 +42,7 @@ namespace OnlineShopWebAPIs.APIControllers
 
                 user.UserName = userDTO.email;
 
-                var result = await _userManager.CreateAsync(user, userDTO.password);
+                var result = await _userManager.CreateAsync(user, userDTO.password);    
 
                 if(!result.Succeeded)
                 {
@@ -51,10 +51,14 @@ namespace OnlineShopWebAPIs.APIControllers
 
                     return BadRequest(ModelState);
                 }
-
+                
                 await _userManager.AddToRoleAsync(user, "Customer");
 
-                return Accepted();
+
+                if (await _userService.ValidateUser(new LoginUserDTO() { email = user.Email, password = userDTO.password }))
+                    return Accepted(new { Token = await _userService.CreateToken() });
+                else
+                     return Unauthorized();
 
             
             }catch(Exception ex)
