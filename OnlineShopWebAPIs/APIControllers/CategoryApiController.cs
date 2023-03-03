@@ -69,7 +69,34 @@ namespace OnlineShopWebAPIs.Controllers
             
         }
 
-    
+
+
+        [HttpPost]
+        public async Task<IActionResult> AddNewCategory([FromForm] AddCategoryDTO addCategoryDTO)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            try
+            {
+                _logger.LogInformation($"api  '/api/AddNewCategory/' is being accessed by user _x_ .");
+
+                Category category = _mapper.Map<Category>(addCategoryDTO);
+                _unitOfWork.Categories.Insert(category);
+                _unitOfWork.Save();
+
+                return Accepted();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, " Something went wrong in " + nameof(AddNewCategory));
+                return StatusCode(500, "Internal Server error. Please try again later.");
+
+            }
+        }
+
+
+
 
     }
 }

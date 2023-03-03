@@ -85,7 +85,6 @@ namespace OnlineShopWebAPIs.Controllers
 
 
         [HttpPost]
-        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> AddNewProduct([FromForm]ProductInFormVm productInFormVm) 
         {
             if (!ModelState.IsValid)

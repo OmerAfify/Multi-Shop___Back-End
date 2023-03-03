@@ -31,6 +31,8 @@ namespace OnlineShopWebAPIs.Helpers
                 dest.productsNumber,
                 opt => opt.MapFrom(src => src.products.Count));
 
+            CreateMap<Category, AddCategoryDTO>().ReverseMap();
+
 
             CreateMap<UserDTO, IdentityUserContext>().ReverseMap();
 

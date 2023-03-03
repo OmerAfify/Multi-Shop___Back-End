@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using BusinessLogic.Services;
+using Domains.Interfaces.IServices;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -17,12 +19,10 @@ using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using OnlineShopWebAPIs.Helpers;
-using OnlineShopWebAPIs.Interfaces.IServices;
 using OnlineShopWebAPIs.Interfaces.IUnitOfWork;
 using OnlineShopWebAPIs.Models;
 using OnlineShopWebAPIs.Models.DBContext;
 using OnlineShopWebAPIs.Models.SettingsModels;
-using OnlineShopWebAPIs.Services;
 using Serilog;
 
 namespace OnlineShopWebAPIs
@@ -82,7 +82,7 @@ namespace OnlineShopWebAPIs
 
 
             //DI 
-            services.AddScoped<IUserService, UserService>();
+            services.AddScoped<ITokenService, TokenService>();
 
             //DbContext congig
             services.AddDbContext<OnlineShopDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("OnlineShop_DB")));
@@ -93,6 +93,22 @@ namespace OnlineShopWebAPIs
 
             //AutoMapper config
             services.AddAutoMapper(typeof(ApplicationMappingProfile));
+
+
+            //ApiController overriding default modelstate behavior
+            services.Configure<ApiBehaviorOptions>(opt => {
+                opt.InvalidModelStateResponseFactory = actionContext =>
+                {
+                    var errors = actionContext.ModelState.Where(e => e.Value.Errors.Count > 0)
+                                 .SelectMany(x => x.Value.Errors).Select(x => x.ErrorMessage).ToArray();
+
+                    return new BadRequestObjectResult(new{ Errors = errors });
+
+                };
+
+            });
+
+
 
             //Swagger config
             services.AddSwaggerGen(c =>
