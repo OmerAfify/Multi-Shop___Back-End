@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Models;
 using OnlineShopWebAPIs.Interfaces.IGeneralRepository;
 using OnlineShopWebAPIs.Interfaces.IUnitOfWork;
 using OnlineShopWebAPIs.Models;
@@ -22,6 +23,12 @@ namespace OnlineShopWebAPIs.UnitOfWork
         public IGeneralRepository<ProductImage> ProductImages { get; }
 
 
+
+        public IGeneralRepository<OrderDeliveryMethods> DeliveryMethods { get; }
+        public IGeneralRepository<Order> Orders { get; }
+
+
+
         public UnitOfWork(OnlineShopDbContext context)
         {
             _context = context;
@@ -30,6 +37,10 @@ namespace OnlineShopWebAPIs.UnitOfWork
             Categories = new GeneralRepository<Category>(context);
             Reviews = new GeneralRepository<Review>(context);
             ProductImages = new GeneralRepository<ProductImage>(context);
+
+            DeliveryMethods = new GeneralRepository<OrderDeliveryMethods>(_context);
+            Orders = new GeneralRepository<Order>(_context);
+
         }
 
 
@@ -38,10 +49,9 @@ namespace OnlineShopWebAPIs.UnitOfWork
             _context.Dispose();
         }
 
-        public void Save()
+        public int Save()
         {
-           // _context.Set<Product>().Where(c => c.productId == 1);
-            _context.SaveChanges();
+            return _context.SaveChanges();
         }
     }
 }

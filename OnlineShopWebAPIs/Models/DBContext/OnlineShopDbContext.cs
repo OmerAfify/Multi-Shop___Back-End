@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Models;
 
 namespace OnlineShopWebAPIs.Models.DBContext
 {
@@ -18,6 +19,13 @@ namespace OnlineShopWebAPIs.Models.DBContext
         public DbSet<Category> Tb_Categories { get; set; }
         public DbSet<Review> Tb_Reviews { get; set; }
         public DbSet<ProductImage> Tb_ProductImages { get; set; }
+
+
+
+        public DbSet<Order> Orders { get; set; }
+        public DbSet<OrderedItem> OrderedItems { get; set; }
+        public DbSet<OrderDeliveryMethods> DeliveryMethods { get; set; }
+        public DbSet<OrderStatus> OrderStatus { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -46,8 +54,18 @@ namespace OnlineShopWebAPIs.Models.DBContext
             });
 
 
-        } 
-        
+            //Orders Config
+            modelBuilder.Entity<Order>().OwnsOne(sa => sa.ShippingAddress, a => { a.WithOwner(); });
+            modelBuilder.Entity<Order>().Property(p => p.SubTotal).HasColumnType("decimal(18,2)");
+            modelBuilder.Entity<Order>().Property(p => p.Total).HasColumnType("decimal(18,2)");
+            modelBuilder.Entity<Order>().HasMany(o => o.OrderedItems).WithOne().OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<OrderedItem>().OwnsOne(i => i.ProductItemOrdered, pio => { pio.WithOwner(); });
+            modelBuilder.Entity<OrderedItem>().Property(p => p.TotalPrice).HasColumnType("decimal(18,2)");
+
+
+        }
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             base.OnConfiguring(optionsBuilder);

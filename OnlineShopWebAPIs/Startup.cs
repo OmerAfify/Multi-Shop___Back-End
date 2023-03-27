@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using BusinessLogic.Services;
 using Domains.Interfaces.IServices;
+using Interfaces.IServices;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -83,6 +84,11 @@ namespace OnlineShopWebAPIs
 
             //DI 
             services.AddScoped<ITokenService, TokenService>();
+
+
+            //Orders service
+            services.AddScoped<IOrderService, OrderService>();
+
 
             //DbContext congig
             services.AddDbContext<OnlineShopDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("OnlineShop_DB")));

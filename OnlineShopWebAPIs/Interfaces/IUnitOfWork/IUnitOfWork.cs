@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Models;
 using OnlineShopWebAPIs.Interfaces.IGeneralRepository;
 using OnlineShopWebAPIs.Models;
 
@@ -14,6 +15,9 @@ namespace OnlineShopWebAPIs.Interfaces.IUnitOfWork
         IGeneralRepository<Review> Reviews { get; }
         IGeneralRepository<ProductImage> ProductImages { get; }
 
-        public void Save();
+        public IGeneralRepository<OrderDeliveryMethods> DeliveryMethods { get; }
+        public IGeneralRepository<Order> Orders { get; }
+
+        public int Save();
     }
 }
