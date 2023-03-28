@@ -8,6 +8,7 @@ using Helpers.ValueResolvers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Models;
+using Models.Models;
 using OnlineShopWebAPIs.DTOs;
 using OnlineShopWebAPIs.Models;
 using OnlineShopWebAPIs.Models.SettingsModels;
@@ -41,6 +42,8 @@ namespace OnlineShopWebAPIs.Helpers
 
 
             CreateMap<OrderAddress, OrderAddressDTO>().ReverseMap();
+
+            CreateMap<Address, AddressDTO>().ReverseMap();
 
 
 

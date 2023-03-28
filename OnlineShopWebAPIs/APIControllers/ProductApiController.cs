@@ -8,12 +8,12 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Models.Interfaces.IUnitOfWork;
+using Models.Models;
+using Models.ViewModels;
 using OnlineShopWebAPIs.DTOs;
 using OnlineShopWebAPIs.Helpers;
-using OnlineShopWebAPIs.Interfaces.IUnitOfWork;
-using OnlineShopWebAPIs.Models;
 using OnlineShopWebAPIs.Models.SettingsModels;
-using OnlineShopWebAPIs.ViewModels;
 
 
 namespace OnlineShopWebAPIs.Controllers

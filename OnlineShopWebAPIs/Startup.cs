@@ -1,28 +1,25 @@
-using System;
-using System.Collections.Generic;
+
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using BusinessLogic.Services;
-using Domains.Interfaces.IServices;
-using Interfaces.IServices;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Models.Interfaces.IServices;
+using Models.Interfaces.IUnitOfWork;
+using Models.Models;
+using OnlineShopWebAPIs.BusinessLogic.DBContext;
+using OnlineShopWebAPIs.BusinessLogic.UnitOfWork;
 using OnlineShopWebAPIs.Helpers;
-using OnlineShopWebAPIs.Interfaces.IUnitOfWork;
-using OnlineShopWebAPIs.Models;
-using OnlineShopWebAPIs.Models.DBContext;
 using OnlineShopWebAPIs.Models.SettingsModels;
 using Serilog;
 
@@ -51,7 +48,8 @@ namespace OnlineShopWebAPIs
             services.Configure<TokenSettings>(Configuration.GetSection("Jwt"));
 
             //Controllers Config + Self-Referencing loop config
-            services.AddControllers().AddNewtonsoftJson(options=>options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
+            services.AddControllers();
+          //  .AddNewtonsoftJson(options=>options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
 
 
             //identity
@@ -95,7 +93,7 @@ namespace OnlineShopWebAPIs
 
 
             //IUnitOfWork Config
-            services.AddScoped<IUnitOfWork, UnitOfWork.UnitOfWork>();
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
 
             //AutoMapper config
             services.AddAutoMapper(typeof(ApplicationMappingProfile));

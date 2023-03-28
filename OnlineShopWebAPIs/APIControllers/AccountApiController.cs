@@ -4,14 +4,14 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using AutoMapper;
-using Domains.Interfaces.IServices;
 using Microsoft.AspNetCore.Authorization;
 
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Models.Interfaces.IServices;
+using Models.Models;
 using OnlineShopWebAPIs.DTOs;
-using OnlineShopWebAPIs.Models;
 
 namespace CoffeeCorner.Controllers
 {
@@ -37,8 +37,6 @@ namespace CoffeeCorner.Controllers
         [Authorize]
         public async Task<ActionResult<UserDTO>> GetCurrentUser()
         {
-
-
             try
             {    
                 var email =  User.FindFirstValue(ClaimTypes.Email);
@@ -62,58 +60,63 @@ namespace CoffeeCorner.Controllers
         }
 
 
-        //[HttpGet]
-        //[Authorize]
-        //public async Task<ActionResult<AddressDTO>> GetCurrentUserAddress()
-        //{
+
+        [Authorize]
+        [HttpGet]
+        public async Task<ActionResult<AddressDTO>> GetCurrentUserAddress()
+        {
+
+            try
+            {
+                var email = User.FindFirstValue(ClaimTypes.Email);
+                var user = await _userManager.Users.Include(a=>a.address).Where(u=>u.Email==email).FirstOrDefaultAsync();
 
 
-        //    try
-        //    {  //extrntion method being used 
-        //        var user = await _userManager.GetUserAddressWithClaimsPrincipal(User);
+                if (user == null)
+                    return BadRequest();
 
 
-        //        if (user == null)
-        //            return BadRequest();
 
-        //        return Ok(_mapper.Map<AddressDTO>(user.address));
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return Problem("an error occured.");
-        //    }
-        //}
-
-        //[HttpPut]
-        //[Authorize]
-        //public async Task<ActionResult<AddressDTO>> UpdateUserAddress([FromBody] AddressDTO addressDTO)
-        //{
-
-        //    if (!ModelState.IsValid)
-        //        return BadRequest(ModelState.Select(x => x.Value.Errors).Where(y => y.Count > 0).ToList());
+                return Ok(_mapper.Map<AddressDTO>(user.address));
+            }
+            catch (Exception ex)
+            {
+                return Problem("an error occured." + ex.Message);
+            }
+        }
 
 
-        //    try
-        //    {
-        //        var user = await _userManager.GetUserAddressWithClaimsPrincipal(User);
+        [Authorize]
+        [HttpPut]
+        public async Task<ActionResult<AddressDTO>> UpdateUserAddress([FromBody] AddressDTO addressDTO)
+        {
 
-        //        user.address = _mapper.Map<Address>(addressDTO);
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState.Select(x => x.Value.Errors).Where(y => y.Count > 0).ToList());
 
-        //        var result = await _userManager.UpdateAsync(user);
 
-        //        if (!result.Succeeded)
-        //            return BadRequest();
+            try
+            {
+                var email = User.FindFirstValue(ClaimTypes.Email); 
+                var user = await _userManager.Users.Include(a => a.address).Where(u => u.Email == email).FirstOrDefaultAsync();
 
-        //        return Ok(_mapper.Map<AddressDTO>(user.address));
+                user.address = _mapper.Map<Address>(addressDTO);
 
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return Problem(" error has occured. " + ex.Message);
+                var result = await _userManager.UpdateAsync(user);
 
-        //    }
+                if (!result.Succeeded)
+                    return BadRequest();
 
-        //}
+                return Ok(_mapper.Map<AddressDTO>(user.address));
+
+            }
+            catch (Exception ex)
+            {
+                return Problem(" error has occured. " + ex.Message);
+
+            }
+
+        }
 
 
         [HttpPost]

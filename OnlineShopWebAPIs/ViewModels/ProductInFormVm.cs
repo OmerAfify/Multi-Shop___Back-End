@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using OnlineShopWebAPIs.DTOs;
 
-namespace OnlineShopWebAPIs.ViewModels
+namespace Models.ViewModels
 {
     public class ProductInFormVm
     {

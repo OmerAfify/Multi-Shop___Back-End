@@ -1,17 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Models.Interfaces.IUnitOfWork;
+using Models.Models;
 using OnlineShopWebAPIs.DTOs;
-using OnlineShopWebAPIs.Interfaces.IUnitOfWork;
-using OnlineShopWebAPIs.Models;
-using OnlineShopWebAPIs.Models.DBContext;
-
 namespace OnlineShopWebAPIs.Controllers
 {
     [Route("api/[action]")]

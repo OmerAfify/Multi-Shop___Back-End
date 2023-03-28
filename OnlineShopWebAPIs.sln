@@ -3,7 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.32228.343
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OnlineShopWebAPIs", "OnlineShopWebAPIs\OnlineShopWebAPIs.csproj", "{AF38CB9D-B114-4DCC-A7C3-B0655A72462C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OnlineShopWebAPIs", "OnlineShopWebAPIs\OnlineShopWebAPIs.csproj", "{AF38CB9D-B114-4DCC-A7C3-B0655A72462C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Models", "Models\Models.csproj", "{0045F672-6F9F-4482-A9E7-A8E5BD8D9FC0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BusinessLogic", "BusinessLogic\BusinessLogic.csproj", "{1687039D-F83E-45EF-8D42-81B20D9742FC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +19,14 @@ Global
 		{AF38CB9D-B114-4DCC-A7C3-B0655A72462C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AF38CB9D-B114-4DCC-A7C3-B0655A72462C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AF38CB9D-B114-4DCC-A7C3-B0655A72462C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0045F672-6F9F-4482-A9E7-A8E5BD8D9FC0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0045F672-6F9F-4482-A9E7-A8E5BD8D9FC0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0045F672-6F9F-4482-A9E7-A8E5BD8D9FC0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0045F672-6F9F-4482-A9E7-A8E5BD8D9FC0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1687039D-F83E-45EF-8D42-81B20D9742FC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1687039D-F83E-45EF-8D42-81B20D9742FC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1687039D-F83E-45EF-8D42-81B20D9742FC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1687039D-F83E-45EF-8D42-81B20D9742FC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
