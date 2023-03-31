@@ -18,6 +18,9 @@ namespace Models.Interfaces.IUnitOfWork
 
         public IGeneralRepository<OrderDeliveryMethods> DeliveryMethods { get; }
         public IGeneralRepository<Order> Orders { get; }
+        
+        public IGeneralRepository<ShoppingCart> ShoppingCart { get; }
+     //   public IGeneralRepository<CartItem> CartItem { get; }
 
         public int Save();
     }

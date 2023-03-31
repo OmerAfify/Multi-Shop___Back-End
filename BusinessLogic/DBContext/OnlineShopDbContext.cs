@@ -22,6 +22,10 @@ namespace OnlineShopWebAPIs.BusinessLogic.DBContext
         public DbSet<ProductImage> Tb_ProductImages { get; set; }
 
 
+        public DbSet<ShoppingCart> ShoppingCart { get; set; }
+        public DbSet<CartItem> CartItems { get; set; }
+
+
 
         public DbSet<Order> Orders { get; set; }
         public DbSet<OrderedItem> OrderedItems { get; set; }
@@ -64,6 +68,11 @@ namespace OnlineShopWebAPIs.BusinessLogic.DBContext
 
             modelBuilder.Entity<OrderedItem>().OwnsOne(i => i.ProductItemOrdered, pio => { pio.WithOwner(); });
             modelBuilder.Entity<OrderedItem>().Property(p => p.TotalPrice).HasColumnType("decimal(18,2)");
+
+
+            //shoppingCart config
+
+            modelBuilder.Entity<CartItem>().HasKey(i => new { i.productId,i.ShoppingCartId} );
 
 
         }

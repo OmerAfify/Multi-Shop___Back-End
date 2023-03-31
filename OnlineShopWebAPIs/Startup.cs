@@ -1,6 +1,7 @@
 
 using System.Linq;
 using System.Text;
+using BusinessLogic.Repository.BusinessRepository;
 using BusinessLogic.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -14,6 +15,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Models.Interfaces.IBusinessRepository;
 using Models.Interfaces.IServices;
 using Models.Interfaces.IUnitOfWork;
 using Models.Models;
@@ -48,8 +50,7 @@ namespace OnlineShopWebAPIs
             services.Configure<TokenSettings>(Configuration.GetSection("Jwt"));
 
             //Controllers Config + Self-Referencing loop config
-            services.AddControllers();
-          //  .AddNewtonsoftJson(options=>options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
+            services.AddControllers().AddNewtonsoftJson(options=>options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
 
 
             //identity
@@ -80,12 +81,14 @@ namespace OnlineShopWebAPIs
             services.AddAuthorization();
 
 
-            //DI 
+
+
+            //Services
             services.AddScoped<ITokenService, TokenService>();
-
-
-            //Orders service
             services.AddScoped<IOrderService, OrderService>();
+            services.AddScoped<IPaymentService, PaymentService>();
+
+            services.AddScoped<IShoppingCartRepository, ShoppingCartRepository>();
 
 
             //DbContext congig

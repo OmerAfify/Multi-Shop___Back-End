@@ -34,12 +34,25 @@ namespace APIControllers
         [HttpPost]
         public async Task<ActionResult<OrderReturnedDTO>> CreateOrderAsync(OrderDTO orderDTO)
         {
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             try
             {
+
+                //ModelState is Valid
+
                 var user = User.FindFirstValue(ClaimTypes.Email);
                 var address = _mapper.Map<OrderAddress>(orderDTO.shippingAddress);
 
-                var order =  _orderService.CreateOrder(user, orderDTO.shoppingCart,
+
+
+                //if(orderDTO.shoppingCart.items.Count<=0 || orderDTO.shoppingCart==null)
+                //    return BadRequest("Your shoppingCart is empty. can't create an order.");
+
+
+                var order =  _orderService.CreateOrder(user, orderDTO.shoppingCartId,
                                                             orderDTO.DeliveryMethodId, address);
 
                 if (order != null)

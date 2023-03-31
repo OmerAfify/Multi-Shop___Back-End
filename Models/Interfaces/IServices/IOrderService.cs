@@ -11,7 +11,7 @@ namespace Models.Interfaces.IServices
 {
     public interface IOrderService
     {
-        public Order CreateOrder(string buyerEmail, ShoppingCart shoppingCart,
+        public Order CreateOrder(string buyerEmail, string shoppingCartId,
                                              int deliveryMethodId, OrderAddress orderAddress);
 
         public Order GetOrderById(string buyerEmail, int orderId);

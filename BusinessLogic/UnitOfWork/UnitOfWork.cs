@@ -27,6 +27,8 @@ namespace OnlineShopWebAPIs.BusinessLogic.UnitOfWork
         public IGeneralRepository<OrderDeliveryMethods> DeliveryMethods { get; }
         public IGeneralRepository<Order> Orders { get; }
 
+        public IGeneralRepository<ShoppingCart> ShoppingCart { get; }
+        //public IGeneralRepository<CartItem> CartItem { get; }
 
 
         public UnitOfWork(OnlineShopDbContext context)
@@ -40,6 +42,9 @@ namespace OnlineShopWebAPIs.BusinessLogic.UnitOfWork
 
             DeliveryMethods = new GeneralRepository<OrderDeliveryMethods>(_context);
             Orders = new GeneralRepository<Order>(_context);
+            
+            ShoppingCart = new GeneralRepository<ShoppingCart>(_context);
+            //CartItem = new GeneralRepository<CartItem>(_context);
 
         }
 

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Models;
+using Models.Interfaces.IBusinessRepository;
 using Models.Interfaces.IServices;
 using Models.Interfaces.IUnitOfWork;
 using Models.Models;
@@ -13,10 +14,13 @@ namespace BusinessLogic.Services
     public class OrderService : IOrderService
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IShoppingCartRepository _shoppingCartRepository;
  
-        public OrderService(IUnitOfWork unitOfWork)
+        public OrderService(IUnitOfWork unitOfWork, IShoppingCartRepository shoppingCartRepository)
         {
             _unitOfWork = unitOfWork;
+            _shoppingCartRepository = shoppingCartRepository;
+              
         }
 
       
@@ -45,18 +49,27 @@ namespace BusinessLogic.Services
             return  _unitOfWork.DeliveryMethods.GetAll(); 
         }
 
-        public Order CreateOrder(string buyerEmail, ShoppingCart shoppingCart, int deliveryMethodId, OrderAddress orderAddress)
+
+        public Order CreateOrder(string buyerEmail, string shoppingCartId, int deliveryMethodId, OrderAddress orderAddress)
         {
             var orderedItemsList = new List<OrderedItem>();
+
+            var shoppingCart = _shoppingCartRepository.GetShoppingCartByIdAsync(shoppingCartId).Result;
+
+            if (shoppingCart == null)
+                return null;
 
             foreach (var cartItem in shoppingCart.items)
             {
 
                 var productItem = _unitOfWork.Products.Find(i => i.productId == cartItem.productId, new List<string>() { "productImages" });
 
+                if (productItem == null)
+                    break;
+
                 var productItemOrdered = new ProductItemOrdered(productItem.productId, productItem.productName, productItem.productImages[0].productImageName, (decimal)productItem.salesPrice);
 
-                var orderedItem = new OrderedItem(productItemOrdered, cartItem.quantity, cartItem.quantity * cartItem.salesPrice);
+                var orderedItem = new OrderedItem(productItemOrdered, cartItem.quantity,cartItem.quantity * (decimal)cartItem.salesPrice);
 
                 orderedItemsList.Add(orderedItem);
             }

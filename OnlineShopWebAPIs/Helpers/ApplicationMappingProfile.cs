@@ -44,7 +44,10 @@ namespace OnlineShopWebAPIs.Helpers
             CreateMap<OrderAddress, OrderAddressDTO>().ReverseMap();
 
             CreateMap<Address, AddressDTO>().ReverseMap();
-
+            
+            
+            CreateMap<ShoppingCart, ShoppingCartDTO>().ReverseMap();
+            CreateMap<CartItem, CartItemDTO>().ReverseMap();
 
 
             CreateMap<OrderReturnedDTO, Order>().ReverseMap()
