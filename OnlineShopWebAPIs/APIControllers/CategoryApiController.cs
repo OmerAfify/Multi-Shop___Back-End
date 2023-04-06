@@ -14,9 +14,9 @@ namespace OnlineShopWebAPIs.Controllers
     public class CategoryApiController : Controller
     {
 
-        private IUnitOfWork _unitOfWork{ get;}
-        private IMapper _mapper{ get;}
-        private ILogger<CategoryApiController> _logger{ get;}
+        private readonly IUnitOfWork _unitOfWork;
+        private readonly IMapper _mapper;
+        private readonly ILogger<CategoryApiController> _logger;
 
 
         public CategoryApiController(IUnitOfWork unitOfWork, IMapper mapper, ILogger<CategoryApiController> logger)
@@ -28,22 +28,26 @@ namespace OnlineShopWebAPIs.Controllers
 
 
         [HttpGet]
-        public IActionResult GetAllCategories()
+        public async Task<ActionResult<IEnumerable<CategoryDTO>>> GetAllCategories()
         {
             try {
-                
-                _logger.LogInformation("api '/api/GetAllCategories' is being accessed by user _x_ .");
-                return Ok(_mapper.Map<List<CategoryDTO>>(_unitOfWork.Categories.GetAll(new List<string>() { "products" })));
+                var categories = await _unitOfWork.Categories.GetAllAsync(new List<string>() { "products" });
+
+                if (categories == null)
+                    return NotFound();
+
+                return Ok( _mapper.Map<List<CategoryDTO>>(categories));
             
             }catch(Exception ex)
             {
                 _logger.LogError(ex, " Something went wrong in " + nameof(GetAllCategories));
+
                 return StatusCode(500, "Internal Server error. Please try again later.");
 
             }
-
           
         }
+
 
 
         [HttpGet("{id:int}")]
@@ -51,8 +55,13 @@ namespace OnlineShopWebAPIs.Controllers
         {
             try
             {
-                _logger.LogInformation($"api  '/api/GetCategoryById/{id}' is being accessed by user _x_ .");
-                return Ok(_mapper.Map<CategoryDTO>(_unitOfWork.Categories.Find(c => c.categoryId == id, new List<string>() { "products" })));
+                var category = _unitOfWork.Categories.FindAsync(c => c.categoryId == id, new List<string>() { "products" });
+
+                if (category == null)
+                    return NotFound();
+
+                return Ok(_mapper.Map<CategoryDTO>(category));
+
             }
             catch (Exception ex)
             {
@@ -74,13 +83,17 @@ namespace OnlineShopWebAPIs.Controllers
 
             try
             {
-                _logger.LogInformation($"api  '/api/AddNewCategory/' is being accessed by user _x_ .");
-
+            
                 Category category = _mapper.Map<Category>(addCategoryDTO);
-                _unitOfWork.Categories.Insert(category);
-                _unitOfWork.Save();
 
-                return Accepted();
+                _unitOfWork.Categories.InsertAsync(category);
+                var result = await _unitOfWork.Save();
+
+
+                if (result > 0)
+                    return Accepted(category);
+                else
+                    return BadRequest();
             }
             catch (Exception ex)
             {

@@ -90,6 +90,8 @@ namespace OnlineShopWebAPIs
 
             services.AddScoped<IShoppingCartRepository, ShoppingCartRepository>();
 
+            services.AddScoped<IProductsRepository, ProductsRepository>();
+
 
             //DbContext congig
             services.AddDbContext<OnlineShopDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("OnlineShop_DB")));

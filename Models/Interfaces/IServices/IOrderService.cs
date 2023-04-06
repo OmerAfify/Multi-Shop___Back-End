@@ -11,12 +11,12 @@ namespace Models.Interfaces.IServices
 {
     public interface IOrderService
     {
-        public Order CreateOrder(string buyerEmail, string shoppingCartId,
+        public Task<Order> CreateOrder(string buyerEmail, string shoppingCartId,
                                              int deliveryMethodId, OrderAddress orderAddress);
 
-        public Order GetOrderById(string buyerEmail, int orderId);
-        public IEnumerable<Order> GetUserOrders(string email);
-        public IEnumerable<OrderDeliveryMethods> GetDeliveryMethods();
+        public Task<Order> GetOrderByIdAsync(string buyerEmail, int orderId);
+        public Task<IEnumerable<Order>> GetUserOrdersAsync(string email);
+        public Task<IEnumerable<OrderDeliveryMethods>> GetDeliveryMethods();
 
 
 

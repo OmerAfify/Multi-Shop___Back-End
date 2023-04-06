@@ -36,14 +36,14 @@ namespace BusinessLogic.Services
 
             if (shoppingCart.DeliveryMethodId.HasValue)
             {
-                var deliveryMethod = _unitOfWork.DeliveryMethods.GetById((int)shoppingCart.DeliveryMethodId);
+                var deliveryMethod = await _unitOfWork.DeliveryMethods.GetByIdAsync((int)shoppingCart.DeliveryMethodId);
                 shippingPrice = (decimal)deliveryMethod.DeliveryPrice;
             }
 
 
             foreach(var item in shoppingCart.items)
             {
-                var product = _unitOfWork.Products.GetById(item.productId);
+                var product = await _unitOfWork.Products.GetByIdAsync(item.productId);
 
                 if(item.salesPrice != product.salesPrice)
                 {

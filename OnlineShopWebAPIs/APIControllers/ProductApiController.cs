@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Models.Filtration;
 using Models.Interfaces.IUnitOfWork;
 using Models.Models;
 using Models.ViewModels;
@@ -23,10 +24,10 @@ namespace OnlineShopWebAPIs.Controllers
     public class ProductApiController : Controller
     {
 
-        private IUnitOfWork _unitOfWork{ get;}
-        private IMapper _mapper{ get;}
-        private ILogger<ProductApiController> _logger{ get;}
-        private IOptions<WebAppSettings> _webAppSettings { get; }
+        private readonly IUnitOfWork _unitOfWork;
+        private readonly IMapper _mapper;
+        private readonly ILogger<ProductApiController> _logger;
+        private readonly IOptions<WebAppSettings> _webAppSettings;
 
         public ProductApiController(IUnitOfWork unitOfWork, IMapper mapper, ILogger<ProductApiController> logger, IOptions<WebAppSettings> webAppSettings )
         {
@@ -38,22 +39,21 @@ namespace OnlineShopWebAPIs.Controllers
         }
 
 
+      
+
         [HttpGet]
-        public IActionResult GetAllProducts()
+        public async Task<ActionResult<IEnumerable<ProductDTO>>> GetAllProducts()
         {
             try {
                 
-                _logger.LogInformation("api '/api/GetAllProducts' is being accessed by user _x_ .");
-
-                var productsList = _mapper.Map<List<ProductDTO>>(_unitOfWork.Products.GetAll(new List<string>() { "category", "productImages" }));   
-                    productsList.ForEach(c => c.productImages.ForEach(i=>i.productImagePath = _webAppSettings.Value.HostName +  i.productImagePath));
-                
+             
+                var productsList = _mapper.Map<List<ProductDTO>>(await _unitOfWork.Products.GetAllAsync(new List<string>() { "category", "productImages" }));   
+    
                 return Ok(productsList);
             
             }catch(Exception ex)
             {
-                _logger.LogError(ex, " Something went wrong in " + nameof(GetAllProducts));
-                return StatusCode(500, "Internal Server error. Please try again later.");
+                 return StatusCode(500, ex.Message + "Internal Server error. Please try again later.");
 
             }
 
@@ -62,16 +62,13 @@ namespace OnlineShopWebAPIs.Controllers
 
  
         [HttpGet("{id:int}")]
-        public IActionResult GetProductById(int id)
+        public async Task<ActionResult<ProductDTO>> GetProductById(int id)
         {
             try
             {
-                _logger.LogInformation($"api  '/api/GetProductById/{id}' is being accessed by user _x_ .");
-               
-                var product = _mapper.Map<ProductDTO>(_unitOfWork.Products.Find(c => c.productId == id, new List<string>() { "category", "productImages" }));
-                product.productImages.ForEach(i=>i.productImagePath = _webAppSettings.Value.HostName + i.productImagePath);
-
-
+                
+                var product = _mapper.Map<ProductDTO>(await _unitOfWork.Products.FindAsync(c => c.productId == id, new List<string>() { "category", "productImages" }));
+      
                 return Ok(product);
             }
             catch (Exception ex)
@@ -84,163 +81,213 @@ namespace OnlineShopWebAPIs.Controllers
         }
 
 
-        [HttpPost]
-        public async Task<IActionResult> AddNewProduct([FromForm]ProductInFormVm productInFormVm) 
+        [HttpGet]
+        public async Task<ActionResult<ProductDTO>> GetRelatedProductsByCategory(int productId)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
             try
             {
-                _logger.LogInformation($"api  '/api/AddNewProduct/' is being accessed by user _x_ .");
+                var product = await _unitOfWork.Products.GetByIdAsync(productId);
 
-                Product product = _mapper.Map<Product>(productInFormVm.addProductDTO);
-                _unitOfWork.Products.Insert(product);
-                _unitOfWork.Save();
 
-                if (productInFormVm.images != null )
-                {
-                  
-                    foreach(var image in productInFormVm.images)
-                    {
-                        //Upload file + get the image's created unique Name.
-                        var imageName = await ImageUploadingHelper.UploadImage(image, Path.Combine(Directory.GetCurrentDirectory(), @"wwwRoot\Images\ProductsImages\cat" + product.categoryId));
+                var relatedProductsList = _mapper.Map<List<ProductDTO>>(await _unitOfWork.Products.FindRangeAsync(p => p.productId != productId && p.categoryId == product.categoryId,
+                                                              new List<string>() { "category", "productImages" }));
 
-                        //Get the uploaded images full path
-                        var imagesPath = Path.Combine(@"Images/ProductsImages/cat" + product.categoryId+ "/"+ imageName);
+                return Ok(relatedProductsList);
 
-                        //new product Image Object
-                        ProductImage productImage = new ProductImage() {
-                            productId = product.productId,
-                            productImageName = imageName,
-                            productImagePath = imagesPath
-                        };
-
-                        _unitOfWork.ProductImages.Insert(productImage);
-                        _unitOfWork.Save();
-                    }
-                }
-
-                return Accepted();
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, " Something went wrong in " + nameof(AddNewProduct));
+                _logger.LogError(ex, " Something went wrong in " + nameof(GetAllProducts));
                 return StatusCode(500, "Internal Server error. Please try again later.");
 
             }
+
+
         }
 
-    
-        [HttpPut]
-       // [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> UpdateProduct (int id, [FromForm]ProductInFormVm productInFormVm)
+
+
+        [HttpGet]
+        public async Task<IActionResult> GetProductsByFiltration([FromQuery] FilteringObject filteringObject)
         {
-
-            if (!ModelState.IsValid || id < 1 )
-                return BadRequest(ModelState);
-
             try
             {
-                _logger.LogInformation($"api  '/api/UpdateProduct/' is being accessed by user _x_ .");
+                var pagination = await _unitOfWork.Products.GetProductsByFilteration(filteringObject);
+                
+                return Ok(_mapper.Map<ProductPaginationDTO>(pagination));
 
-                var product = _unitOfWork.Products.GetById(id);
-               
-                if(product == null)
-                    return BadRequest("the submitted data is invalid");
-
-                var ImagesList = _unitOfWork.ProductImages.FindRange(i => i.productId == product.productId).ToList();
-
-                foreach (var image in ImagesList)
-                    ImageUploadingHelper.DeleteImage(Path.Combine(Directory.GetCurrentDirectory(), @"wwwroot\Images\Productsimages\cat" + product.categoryId + @"\" + image.productImageName));
-
-                _unitOfWork.ProductImages.DeleteRange(ImagesList);
-
-
-                if (productInFormVm.images != null)
-                {
-                    foreach (var image in productInFormVm.images)
-                    {
-
-                      var imagename = await ImageUploadingHelper.UploadImage(image, Path.Combine(Directory.GetCurrentDirectory(), @"wwwroot\Images\Productsimages\cat" + productInFormVm.addProductDTO.categoryId));
-                      var imagespath = Path.Combine(@"Images/Productsimages/cat" + productInFormVm.addProductDTO.categoryId + "/" + imagename);
-
-                       ProductImage productImage = new ProductImage()
-                         {
-                              productId = product.productId,
-                              productImageName = imagename,
-                              productImagePath = imagespath
-                         };
-
-                     _unitOfWork.ProductImages.Insert(productImage);
-                           
-                    }
-                  
-                }
-
-
-                _mapper.Map(productInFormVm.addProductDTO, product);
-                _unitOfWork.Products.Update(product);
-
-
-                _unitOfWork.Save();
-
-                return NoContent();
-            }
-            catch (Exception ex)
+            }catch(Exception ex)
             {
-                _logger.LogError(ex, " Something went wrong in " + nameof(UpdateProduct));
-                return StatusCode(500, "Internal Server error. Please try again later.");
-
+                return StatusCode(500, ex.Message);
             }
 
         }
 
 
-        [HttpDelete]
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> DeleteProduct(int id)
-        {
-
-            if (id < 1)
-                return BadRequest(ModelState);
-
-            try
-            {
-                _logger.LogInformation($"api  '/api/DeleteProduct/' is being accessed by user _x_ .");
 
 
-                var product = _unitOfWork.Products.GetById(id);
-
-                if (product == null)
-                {
-                    return BadRequest("the submitted data is invalid");
-                }
 
 
-                var ImagesList = _unitOfWork.ProductImages.FindRange(i => i.productId == product.productId).ToList();
+        // [HttpPost]
+        // public async Task<IActionResult> AddNewProduct([FromForm]ProductInFormVm productInFormVm) 
+        // {
+        //     if (!ModelState.IsValid)
+        //         return BadRequest(ModelState);
 
-                foreach(var image in ImagesList)
-                {
-                    var path = Path.Combine(Directory.GetCurrentDirectory(), @"wwwroot\Images\Productsimages\cat" + product.categoryId + @"\" + image.productImageName );
-                    ImageUploadingHelper.DeleteImage(path);
-                }
+        //     try
+        //     {
+        //         _logger.LogInformation($"api  '/api/AddNewProduct/' is being accessed by user _x_ .");
 
-                _unitOfWork.Products.Delete(product);
+        //         Product product = _mapper.Map<Product>(productInFormVm.addProductDTO);
+        //         _unitOfWork.Products.Insert(product);
+        //         _unitOfWork.Save();
 
-                _unitOfWork.Save();
+        //         if (productInFormVm.images != null )
+        //         {
 
-                return NoContent();  
-             
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, " Something went wrong in " + nameof(DeleteProduct));
-                return StatusCode(500, "Internal Server error. Please try again later.");
+        //             foreach(var image in productInFormVm.images)
+        //             {
+        //                 //Upload file + get the image's created unique Name.
+        //                 var imageName = await ImageUploadingHelper.UploadImage(image, Path.Combine(Directory.GetCurrentDirectory(), @"wwwRoot\Images\ProductsImages\cat" + product.categoryId));
 
-            }
+        //                 //Get the uploaded images full path
+        //                 var imagesPath = Path.Combine(@"Images/ProductsImages/cat" + product.categoryId+ "/"+ imageName);
 
-        }
+        //                 //new product Image Object
+        //                 ProductImage productImage = new ProductImage() {
+        //                     productId = product.productId,
+        //                     productImageName = imageName,
+        //                     productImagePath = imagesPath
+        //                 };
+
+        //                 _unitOfWork.ProductImages.Insert(productImage);
+        //                 _unitOfWork.Save();
+        //             }
+        //         }
+
+        //         return Accepted();
+        //     }
+        //     catch (Exception ex)
+        //     {
+        //         _logger.LogError(ex, " Something went wrong in " + nameof(AddNewProduct));
+        //         return StatusCode(500, "Internal Server error. Please try again later.");
+
+        //     }
+        // }
+
+
+        // [HttpPut]
+        //// [Authorize(Roles = "Admin")]
+        // public async Task<IActionResult> UpdateProduct (int id, [FromForm]ProductInFormVm productInFormVm)
+        // {
+
+        //     if (!ModelState.IsValid || id < 1 )
+        //         return BadRequest(ModelState);
+
+        //     try
+        //     {
+        //         _logger.LogInformation($"api  '/api/UpdateProduct/' is being accessed by user _x_ .");
+
+        //         var product = _unitOfWork.Products.GetById(id);
+
+        //         if(product == null)
+        //             return BadRequest("the submitted data is invalid");
+
+        //         var ImagesList = _unitOfWork.ProductImages.FindRange(i => i.productId == product.productId).ToList();
+
+        //         foreach (var image in ImagesList)
+        //             ImageUploadingHelper.DeleteImage(Path.Combine(Directory.GetCurrentDirectory(), @"wwwroot\Images\Productsimages\cat" + product.categoryId + @"\" + image.productImageName));
+
+        //         _unitOfWork.ProductImages.DeleteRange(ImagesList);
+
+
+        //         if (productInFormVm.images != null)
+        //         {
+        //             foreach (var image in productInFormVm.images)
+        //             {
+
+        //               var imagename = await ImageUploadingHelper.UploadImage(image, Path.Combine(Directory.GetCurrentDirectory(), @"wwwroot\Images\Productsimages\cat" + productInFormVm.addProductDTO.categoryId));
+        //               var imagespath = Path.Combine(@"Images/Productsimages/cat" + productInFormVm.addProductDTO.categoryId + "/" + imagename);
+
+        //                ProductImage productImage = new ProductImage()
+        //                  {
+        //                       productId = product.productId,
+        //                       productImageName = imagename,
+        //                       productImagePath = imagespath
+        //                  };
+
+        //              _unitOfWork.ProductImages.Insert(productImage);
+
+        //             }
+
+        //         }
+
+
+        //         _mapper.Map(productInFormVm.addProductDTO, product);
+        //         _unitOfWork.Products.Update(product);
+
+
+        //         _unitOfWork.Save();
+
+        //         return NoContent();
+        //     }
+        //     catch (Exception ex)
+        //     {
+        //         _logger.LogError(ex, " Something went wrong in " + nameof(UpdateProduct));
+        //         return StatusCode(500, "Internal Server error. Please try again later.");
+
+        //     }
+
+        // }
+
+
+        // [HttpDelete]
+        // [Authorize(Roles = "Admin")]
+        // public async Task<IActionResult> DeleteProduct(int id)
+        // {
+
+        //     if (id < 1)
+        //         return BadRequest(ModelState);
+
+        //     try
+        //     {
+        //         _logger.LogInformation($"api  '/api/DeleteProduct/' is being accessed by user _x_ .");
+
+
+        //         var product = _unitOfWork.Products.GetById(id);
+
+        //         if (product == null)
+        //         {
+        //             return BadRequest("the submitted data is invalid");
+        //         }
+
+
+        //         var ImagesList = _unitOfWork.ProductImages.FindRange(i => i.productId == product.productId).ToList();
+
+        //         foreach(var image in ImagesList)
+        //         {
+        //             var path = Path.Combine(Directory.GetCurrentDirectory(), @"wwwroot\Images\Productsimages\cat" + product.categoryId + @"\" + image.productImageName );
+        //             ImageUploadingHelper.DeleteImage(path);
+        //         }
+
+        //         _unitOfWork.Products.Delete(product);
+
+        //         _unitOfWork.Save();
+
+        //         return NoContent();  
+
+        //     }
+        //     catch (Exception ex)
+        //     {
+        //         _logger.LogError(ex, " Something went wrong in " + nameof(DeleteProduct));
+        //         return StatusCode(500, "Internal Server error. Please try again later.");
+
+        //     }
+
+        // }
+
+
+
 
 
 

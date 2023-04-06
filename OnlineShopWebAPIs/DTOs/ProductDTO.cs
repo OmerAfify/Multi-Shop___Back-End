@@ -12,7 +12,6 @@ namespace OnlineShopWebAPIs.DTOs
         public string description { get; set; }
         public int categoryId { get; set; }
 
-
   
       }
     

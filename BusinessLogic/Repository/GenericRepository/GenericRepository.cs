@@ -2,29 +2,33 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using Models.Interfaces.IGeneralRepository;
+using Models.Interfaces.IGenericRepository;
+using Models.RequestParameters;
 
-namespace OnlineShopWebAPIs.BusinessLogic.GeneralRepository
+namespace BusinesssLogic.Repository.GenericRepository
 {
-    public class GeneralRepository<T> : IGeneralRepository<T> where T:class
+    public class GenericRepository<T> : IGenericRepository<T> where T : class
     {
-
         private readonly DbContext _context;
         private readonly DbSet<T> _dbSet;
 
-        public GeneralRepository(DbContext context)
+        public GenericRepository(DbContext context)
         {
             _context = context;
             _dbSet = _context.Set<T>();
         }
 
-        public T GetById(int id)
+        public async Task<T> GetByIdAsync(int id)
         {
-            return _dbSet.Find(id);
+            return await _dbSet.FindAsync(id);
         }
-        public IEnumerable<T> GetAll(List<string> includes = null, Func<IQueryable<T>,IOrderedQueryable<T>> orderBy = null)
+
+
+        public async Task<IEnumerable<T>> GetAllAsync(List<string> includes = null, Func<IQueryable<T>,
+            IOrderedQueryable<T>> orderBy = null, RequestParams requestParams = null)
         {
             IQueryable<T> query = _dbSet;
 
@@ -36,17 +40,23 @@ namespace OnlineShopWebAPIs.BusinessLogic.GeneralRepository
                 }
             }
 
-            if(orderBy != null)
+            if (orderBy != null)
             {
                 query = orderBy(query);
             }
 
-        
-            return query.AsNoTracking().ToList();
+            if (requestParams != null)
+                return await query.AsNoTracking().Skip((requestParams.PageNumber - 1) * requestParams.PageSize).Take(requestParams.PageSize).ToListAsync();
+
+            else
+                return await query.AsNoTracking().ToListAsync();
 
 
         }
-        public T Find(Expression<Func<T, bool>> predicate, List<string> includes = null, Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null) {
+
+
+        public async Task<T> FindAsync(Expression<Func<T, bool>> predicate, List<string> includes = null)
+        {
 
             IQueryable<T> query = _dbSet;
 
@@ -63,16 +73,12 @@ namespace OnlineShopWebAPIs.BusinessLogic.GeneralRepository
                 }
             }
 
-            if (orderBy != null)
-            {
-                query = orderBy(query);
-            }
 
 
-            return query.FirstOrDefault();
+            return await query.FirstOrDefaultAsync();
 
         }
-        public IEnumerable<T> FindRange(Expression<Func<T, bool>> predicate, List<string> includes = null, Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null)
+        public async Task<IEnumerable<T>> FindRangeAsync(Expression<Func<T, bool>> predicate, List<string> includes = null, Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null, RequestParams requestParams = null)
         {
             IQueryable<T> query = _dbSet;
 
@@ -86,7 +92,7 @@ namespace OnlineShopWebAPIs.BusinessLogic.GeneralRepository
             {
                 foreach (var include in includes)
                 {
-                  query =  query.Include(include);
+                    query = query.Include(include);
                 }
             }
 
@@ -95,19 +101,23 @@ namespace OnlineShopWebAPIs.BusinessLogic.GeneralRepository
                 query = orderBy(query);
             }
 
-    
-            return query.ToList();
+
+            if (requestParams != null)
+                return await query.AsNoTracking().Skip((requestParams.PageNumber - 1) * requestParams.PageSize).Take(requestParams.PageSize).ToListAsync();
+
+            else
+                return await query.AsNoTracking().ToListAsync();
 
         }
 
 
-        public void Insert(T entity)
+        public async void InsertAsync(T entity)
         {
-            _dbSet.Add(entity);
+            await _dbSet.AddAsync(entity);
         }
-        public void InsertRange(List<T> entities)
+        public async void InsertRangeAsync(List<T> entities)
         {
-            _dbSet.AddRange(entities);
+            await _dbSet.AddRangeAsync(entities);
         }
 
         public void Delete(T entity)
@@ -123,7 +133,9 @@ namespace OnlineShopWebAPIs.BusinessLogic.GeneralRepository
         {
             _dbSet.Attach(entity);
             _context.Entry(entity).State = EntityState.Modified;
-            
+
         }
+
+
     }
 }

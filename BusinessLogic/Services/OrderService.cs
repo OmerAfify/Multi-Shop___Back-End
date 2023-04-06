@@ -24,17 +24,17 @@ namespace BusinessLogic.Services
         }
 
       
-        public  Order GetOrderById(string buyerEmail, int orderId)
+        public async Task<Order> GetOrderByIdAsync(string buyerEmail, int orderId)
         {
-            var order = _unitOfWork.Orders.Find(o => o.Email == buyerEmail && o.OrderId == orderId,
+            var order = await _unitOfWork.Orders.FindAsync(o => o.Email == buyerEmail && o.OrderId == orderId,
                 new List<string>(){ "DeliveryMethod", "OrderStatus", "OrderedItems"});
 
         return order;
         }
 
-        public IEnumerable<Order> GetUserOrders(string email)
+        public async Task<IEnumerable<Order>> GetUserOrdersAsync(string email)
         {
-            var orders = _unitOfWork.Orders.FindRange(o => o.Email == email,
+            var orders = await _unitOfWork.Orders.FindRangeAsync(o => o.Email == email,
                     new List<string>() { "DeliveryMethod", "OrderStatus", "OrderedItems" },
                     o => o.OrderByDescending(o => o.OrderDate)
                     ); 
@@ -44,13 +44,13 @@ namespace BusinessLogic.Services
         }
 
 
-        public  IEnumerable<OrderDeliveryMethods> GetDeliveryMethods()
+        public async Task<IEnumerable<OrderDeliveryMethods>> GetDeliveryMethods()
         {
-            return  _unitOfWork.DeliveryMethods.GetAll(); 
+            return  await _unitOfWork.DeliveryMethods.GetAllAsync(); 
         }
 
 
-        public Order CreateOrder(string buyerEmail, string shoppingCartId, int deliveryMethodId, OrderAddress orderAddress)
+        public async Task<Order> CreateOrder(string buyerEmail, string shoppingCartId, int deliveryMethodId, OrderAddress orderAddress)
         {
             var orderedItemsList = new List<OrderedItem>();
 
@@ -62,12 +62,12 @@ namespace BusinessLogic.Services
             foreach (var cartItem in shoppingCart.items)
             {
 
-                var productItem = _unitOfWork.Products.Find(i => i.productId == cartItem.productId, new List<string>() { "productImages" });
+                var productItem = await _unitOfWork.Products.FindAsync(i => i.productId == cartItem.productId, new List<string>() { "productImages" });
 
                 if (productItem == null)
                     break;
 
-                var productItemOrdered = new ProductItemOrdered(productItem.productId, productItem.productName, productItem.productImages[0].productImageName, (decimal)productItem.salesPrice);
+                var productItemOrdered = new ProductItemOrdered(productItem.productId, productItem.productName, productItem.productImages[0].productImagePath, (decimal)productItem.salesPrice);
 
                 var orderedItem = new OrderedItem(productItemOrdered, cartItem.quantity,cartItem.quantity * (decimal)cartItem.salesPrice);
 
@@ -75,21 +75,23 @@ namespace BusinessLogic.Services
             }
 
             var subtotal = orderedItemsList.Sum(o => o.TotalPrice);
-            var deliveryMethod = _unitOfWork.DeliveryMethods.GetById(deliveryMethodId);
+            var deliveryMethod = await _unitOfWork.DeliveryMethods.GetByIdAsync(deliveryMethodId);
 
             var order = new Order(orderedItemsList, buyerEmail, orderAddress, subtotal, subtotal + (decimal)deliveryMethod.DeliveryPrice,
             1, deliveryMethodId);
 
 
-            _unitOfWork.Orders.Insert(order);
+            _unitOfWork.Orders.InsertAsync(order);
 
 
-            var result = _unitOfWork.Save();
+            var result =await  _unitOfWork.Save();
 
             if (result <= 0)
                 return null;
             else
+            {
                 return order;
+            }
         }
     }
 

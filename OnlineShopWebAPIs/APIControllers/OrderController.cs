@@ -21,7 +21,7 @@ namespace APIControllers
     {
 
         private readonly IOrderService _orderService;
-        private IMapper _mapper { get; }
+        private readonly IMapper _mapper;
 
         public OrderController(IOrderService orderService, IMapper mapper)
         {
@@ -32,7 +32,7 @@ namespace APIControllers
 
 
         [HttpPost]
-        public async Task<ActionResult<OrderReturnedDTO>> CreateOrderAsync(OrderDTO orderDTO)
+        public async Task<ActionResult<OrderReturnedDTO>> CreateOrder(OrderDTO orderDTO)
         {
 
             if (!ModelState.IsValid)
@@ -47,12 +47,8 @@ namespace APIControllers
                 var address = _mapper.Map<OrderAddress>(orderDTO.shippingAddress);
 
 
-
-                //if(orderDTO.shoppingCart.items.Count<=0 || orderDTO.shoppingCart==null)
-                //    return BadRequest("Your shoppingCart is empty. can't create an order.");
-
-
-                var order =  _orderService.CreateOrder(user, orderDTO.shoppingCartId,
+          
+                var order = await _orderService.CreateOrder(user, orderDTO.shoppingCartId,
                                                             orderDTO.DeliveryMethodId, address);
 
                 if (order != null)
@@ -69,13 +65,13 @@ namespace APIControllers
 
 
         [HttpGet]
-        public ActionResult<OrderReturnedDTO> GetUserOrders()
+        public async Task<ActionResult<IEnumerable<OrderReturnedDTO>>> GetUserOrders()
         {
             try
             {
                 var user = User.FindFirstValue(ClaimTypes.Email);
 
-                var orders = _orderService.GetUserOrders(user);
+                var orders = await _orderService.GetUserOrdersAsync(user);
 
                 if (orders != null)
                     return Ok(_mapper.Map<List<OrderReturnedDTO>>(orders));
@@ -90,13 +86,13 @@ namespace APIControllers
         }
 
         [HttpGet]
-        public ActionResult<OrderReturnedDTO> GetUserOrderById(int orderId)
+        public async Task<ActionResult<OrderReturnedDTO>> GetUserOrderById(int orderId)
         {
             try
             {
                 var user = User.FindFirstValue(ClaimTypes.Email);
 
-                var order = _orderService.GetOrderById(user, orderId);
+                var order = await _orderService.GetOrderByIdAsync(user, orderId);
 
                 if (order != null)
                     return Ok(_mapper.Map<OrderReturnedDTO>(order));
@@ -114,12 +110,12 @@ namespace APIControllers
 
 
         [HttpGet]
-        public ActionResult<IEnumerable<OrderDeliveryMethods>> GetDeliveryMethods()
+        public async Task<ActionResult<IEnumerable<OrderDeliveryMethods>>> GetDeliveryMethods()
         {
             try
             {
 
-                var deliveryMethods = _orderService.GetDeliveryMethods();
+                var deliveryMethods = await _orderService.GetDeliveryMethods();
 
                 if (deliveryMethods != null)
                     return Ok(deliveryMethods);

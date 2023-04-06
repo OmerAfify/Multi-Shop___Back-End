@@ -21,16 +21,16 @@ namespace BusinessLogic.Repository.BusinessRepository
 
         public async Task<ShoppingCart> GetShoppingCartByIdAsync(string id)
         {
-            return  _unitOfWork.ShoppingCart.Find(i => i.id == id, new List<string>() { "items" });
+            return  await _unitOfWork.ShoppingCart.FindAsync(i => i.id == id, new List<string>() { "items" });
         }
 
         public async Task<ShoppingCart> CreateOrUpdateShoppingCartAsync(ShoppingCart shoppingCart)
         {
-            var cart = _unitOfWork.ShoppingCart.Find(i => i.id == shoppingCart.id,new List<string>() { "items" });
+            var cart = await _unitOfWork.ShoppingCart.FindAsync(i => i.id == shoppingCart.id,new List<string>() { "items" });
 
             if(cart==null)
             {
-                _unitOfWork.ShoppingCart.Insert(shoppingCart);
+                _unitOfWork.ShoppingCart.InsertAsync(shoppingCart);
             }
             else
             {
@@ -46,7 +46,7 @@ namespace BusinessLogic.Repository.BusinessRepository
 
             }
 
-            var result  = _unitOfWork.Save();
+            var result  = await _unitOfWork.Save();
 
             if (result < 1)
                 return null;
@@ -58,11 +58,11 @@ namespace BusinessLogic.Repository.BusinessRepository
 
         public async Task<bool> DeleteShoppingCartAsync(string id)
         {
-            var ShoppingCart = _unitOfWork.ShoppingCart.Find(i=>i.id==id);
+            var ShoppingCart = await _unitOfWork.ShoppingCart.FindAsync(i=>i.id==id);
 
             _unitOfWork.ShoppingCart.Delete(ShoppingCart);
 
-            var result = _unitOfWork.Save();
+            var result = await _unitOfWork.Save();
 
             if (result < 1)
                 return false;
