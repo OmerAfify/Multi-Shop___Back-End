@@ -13,7 +13,8 @@ namespace OnlineShopWebAPIs.DTOs
         [Required]
         public string categoryName { get; set; }
         public string categoryDescription { get; set; }
-     }
+        public string categoryImagePath { get; set; }
+    }
 
     public class CategoryDTO : AddCategoryDTO
     {

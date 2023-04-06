@@ -48,7 +48,7 @@ namespace BusinessLogic.Repository.BusinessRepository
 
             var result  = await _unitOfWork.Save();
 
-            if (result < 1)
+            if (result <= 0)
                 return null;
 
             return shoppingCart;

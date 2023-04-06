@@ -33,12 +33,12 @@ namespace OnlineShopWebAPIs.Helpers
                 ForMember(d => d.productImagePath, opt => opt.MapFrom<ProductPictureUrlResolver>()).ReverseMap();
 
 
-            CreateMap<Category, CategoryDTO>()
-            .ForMember(dest =>
-                dest.productsNumber,
-                opt => opt.MapFrom(src => src.products.Count));
+       
 
-            CreateMap<Category, AddCategoryDTO>().ReverseMap();
+
+            CreateMap<CategoryDTO, Category>().ReverseMap()
+                .ForMember(dest =>dest.productsNumber,opt => opt.MapFrom(src => src.products.Count))
+                .ForMember(d => d.categoryImagePath, opt => opt.MapFrom<CategoryPictureUrlResolver>());
 
 
             CreateMap<UserDTO, IdentityUserContext>().ReverseMap();

@@ -13,6 +13,9 @@ namespace Models.Models
        
        [Required]
         public string categoryName { get; set; }
+
+        public string categoryImagePath { get; set; }
+
         public string categoryDescription { get; set; }
 
         public List<Product> products { get; set; }
