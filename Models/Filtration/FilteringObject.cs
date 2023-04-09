@@ -11,6 +11,11 @@ namespace Models.Filtration
     {
         public int categoryId { get; set; }
         public string sortBy { get; set; }
+
+        public string search { get { return _search; }
+            set { _search = (value != null) ? value.ToLower() : null; }
+                             }
+        private string _search;
         public RequestParams requestParameters{ get; set; }
     }
 }

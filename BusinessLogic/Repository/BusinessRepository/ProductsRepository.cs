@@ -34,8 +34,17 @@ namespace BusinessLogic.Repository.BusinessRepository
                 query = query.Where(p => p.categoryId == filterObject.categoryId);
             }
 
+            //filter by name
 
-            // filter by sort 
+            if (!string.IsNullOrEmpty(filterObject.search) )
+            {
+                query = query.Where(p => p.productName.Contains(filterObject.search));
+            }
+
+
+
+
+            // sort 
             if (!string.IsNullOrEmpty( filterObject.sortBy))
             {
                 switch (filterObject.sortBy)
@@ -57,6 +66,7 @@ namespace BusinessLogic.Repository.BusinessRepository
                 }
 
               }
+
 
 
             var pagingData = new Pagination<Product>();
